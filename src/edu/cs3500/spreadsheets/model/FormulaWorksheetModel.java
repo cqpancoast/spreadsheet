@@ -1,5 +1,6 @@
 package edu.cs3500.spreadsheets.model;
 
+import edu.cs3500.spreadsheets.sexp.Parser;
 import edu.cs3500.spreadsheets.sexp.Sexp;
 import edu.cs3500.spreadsheets.sexp.SexpVisitor;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   /**
    * TODO explain why this is here, what it does, and what all of its individual functions do.
    */
-  static class SExpEvaluator implements SexpVisitor<String> {
+  private static class SExpEvaluator implements SexpVisitor<String> {
 
     @Override
     public String visitBoolean(boolean b) {
