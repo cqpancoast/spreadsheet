@@ -22,7 +22,7 @@ import java.util.List;
  *     even recursively (such as, A1 ref's B1, B1 ref's A1.). Examples: A2, C4:E3, F5:A5.
  *   - A function is a string representation of an s-expression. It can also contain other
  *     functions. Some examples: "=3", "=\"bees\"" "=(SUM 3 5)", "=(PRODUCT A2:B5 5)". Valid
- *     functions are contained in the static class {@link FormulaWorksheetFunctions}.
+ *     functions are contained in the static class {@link SExpEvaluator}.
  * Cells with contents deviating from the above prescription are invalid. Cells referencing invalid
  * cells are also invalid.
  */
@@ -65,16 +65,16 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   /**
    * TODO explain why this is here, what it does, and what all of its individual functions do.
    */
-  static class FormulaWorksheetFunctions implements SexpVisitor<String> {
+  static class SExpEvaluator implements SexpVisitor<String> {
 
     @Override
     public String visitBoolean(boolean b) {
-      return null;
+      return Boolean.toString(b);
     }
 
     @Override
     public String visitNumber(double d) {
-      return null;
+      return Double.toString(d);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
 
     @Override
     public String visitSymbol(String s) {
-      return null;
+      return s; //TODO evaluate cell references
     }
 
     @Override
     public String visitString(String s) {
-      return null;
+      return "\"" + s + "\"";
     }
   }
 
