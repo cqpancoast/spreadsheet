@@ -28,33 +28,53 @@ import java.util.List;
  */
 public class FormulaWorksheetModel implements WorksheetModel<String> {
 
-  HashMap<Coord, String> worksheet;
+  private final HashMap<Coord, String> worksheet;
 
   //TODO figure out constructor — how is this actually made? Also in this talk about our field
 
+  public FormulaWorksheetModel(HashMap<Coord, String> worksheet) {
+    this.worksheet = new HashMap<Coord, String>();
+  }
+
   @Override
   public void set(Coord c, String val) {
-
+    worksheet.put(c, val);
   }
 
   @Override
   public String getEval(Coord c) {
+    String raw = worksheet.get(c);
+    if (raw == null) {
+      return "";
+    }
     return null;
   }
 
   @Override
   public String getRaw(Coord c) {
-    return null;
+    String raw = worksheet.get(c);
+    if (raw == null) {
+      return "";
+    }
+    return raw;
   }
 
   @Override
   public int getMaxRows() {
-    return 0;
+    int max = 0;
+    for (Coord c : worksheet.keySet()) {
+      max = Math.max(c.row, max);
+    }
+    return max;
   }
 
   @Override
   public int getMaxColumns() {
-    return 0;
+    int max = 0;
+    for (Coord c : worksheet.keySet()) {
+      max = Math.max(c.col, max);
+    }
+    return max;
   }
 
   @Override
