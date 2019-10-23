@@ -2,9 +2,12 @@ package edu.cs3500.spreadsheets.model;
 
 /**
  * Represents a worksheet in a spreadsheet application, in which there is a potentially infinite
- * grid with values. Those values can be of any type, given by type param T. //HELP BLERNER how to say param T
+ * grid with values. Those values can be of any type, given by type param T. This interface supports
+ * the idea of evaluation, that is, that by some process the evaluated contents of a cell will be
+ * different from its raw contents. //TODO add evaluated type as additional type param?
+ * @param <T> type of cell contents
  */
-public interface WorksheetModel<T> { //HELP BLERNER good design decision to have type param here?
+public interface WorksheetModel<T> { //HELP BLERNER how do you feel about our design?
 
   /**
    * Sets the cell at coordinate c in the grid to have the value val.
@@ -41,7 +44,7 @@ public interface WorksheetModel<T> { //HELP BLERNER good design decision to have
 
   /**
    * Determines whether this worksheet is valid, given any implementation-specific rules, which may
-   * include syntax or cyclic reference.
+   * include cell content syntax, cyclic reference, or data type requirements for particular cells.
    * @return whether this worksheet is valid.
    */
   boolean isValid();
