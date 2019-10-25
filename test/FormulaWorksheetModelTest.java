@@ -1,5 +1,6 @@
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
+import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import java.util.HashMap;
 import org.junit.Test;
 
@@ -8,6 +9,8 @@ import org.junit.Test;
  */
 public class FormulaWorksheetModelTest {
 
+
+
   /** Test for {@link FormulaWorksheetModel#FormulaWorksheetModel(HashMap)}. */
 
   @Test(expected = IllegalArgumentException.class)
@@ -15,11 +18,18 @@ public class FormulaWorksheetModelTest {
     new FormulaWorksheetModel(null);
   }
 
-  // All other constructor functionality is tested implicitly.
+  /** Tests for {@link FormulaWorksheetModel.FormulaWorksheetBuilder}. */
 
   /** Tests for {@link FormulaWorksheetModel#set(Coord, String)}. */
 
-  /** Tests for {@link FormulaWorksheetModel#getEval(Coord)}. */
+  @Test
+  public void set_genericCall() {
+
+  }
+
+  /** Tests for {@link FormulaWorksheetModel#getEval(Coord)}. This testing section is split into
+   * subsections to account for the many different types of evaluation procedures that can go on.
+   * Effectively, this acts as the testing suite for {@link SExpEvaluatorFormulaWorksheet}. */
 
   /** Tests for {@link FormulaWorksheetModel#getRaw(Coord)}. */
 

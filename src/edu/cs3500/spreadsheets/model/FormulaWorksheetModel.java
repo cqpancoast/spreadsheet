@@ -12,8 +12,8 @@ import java.util.HashMap;
  * representation of an {@link Sexp}ression. Each of the SExps in question can be a formula or a
  * value, both of which are represented as strings. There is a process of evaluation for cells in
  * which their raw SExp contents are evaluated to strings, which is discussed for both values and
- * formulae below. (Blank cells are not represented, but IF USED IN A FORMULA will evaluate to the  //TODO do blank cells evaluate to null or ""?
- * string "0".) //TODO explicitly mention this class's SExpEvaluator, whatever it ends up being called
+ * formulae below. (Blank cells are not represented, and will normally evaluate to XYZ. If used in //TODO what do they evaluate to?
+ * a formula, the blank cell may evaluate to something different depending on the formula.) //TODO explicitly mention this class's SExpEvaluator, whatever it ends up being called
  * - A value can be a boolean, a double, or a string. To give examples, booleans are represented as
  *   "true" and "false", a double is represented as a truncated decimal number (i.e. "3", not
  *   "3.0"), and a string is represented as "\"bees\"". Values evaluate to themselves.
