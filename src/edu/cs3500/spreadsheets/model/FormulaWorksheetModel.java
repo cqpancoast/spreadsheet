@@ -24,7 +24,8 @@ import java.util.HashMap;
  *     reference will evaluate to the evaluated contents of the referenced cell. Attempts to
  *     directly evaluate a collection of cells is invalid syntax, but they can be included in
  *     functions, as is explained below. References within a given cell cannot reference that cell,
- *     even recursively (such as, A1 ref's B1, B1 ref's A1.). Examples: A2, C4:E3, F5:A5.
+ *     even recursively (such as, A1 ref's B1, B1 ref's A1.). Examples: A2, C4:E3, F5:A5. Reference
+ *     indexing begins from A and 1.
  *   - A function is a string representation of an equals sign and then any SExp. (For example, "=3"
  *     and "=\"bees\"", which will evaluate to "3" and "\"bees\"".) The more interesting case comes
  *     for SLists. A valid SList for a function consists of a function name and then the correct
@@ -47,13 +48,13 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   }
 
   @Override
-  public void set(Coord c, String val) {
-    worksheet.put(c, val);
+  public void set(int col, int row, String val) {
+    worksheet.put(new Coord(col, row), val);
   }
 
   @Override
-  public String getEval(Coord c) {
-    String raw = getRaw(c);
+  public String getEval(int col, int row) {
+    String raw = getRaw(col, row);
     if (raw == null) {
       return "";
     }
@@ -64,8 +65,8 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   }
 
   @Override
-  public String getRaw(Coord c) {
-    String raw = worksheet.get(c);
+  public String getRaw(int col, int row) {
+    String raw = worksheet.get(new Coord(col, row));
     if (raw == null) {
       return "";
     }
@@ -93,7 +94,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   @Override
   public boolean isValid() {
     for (Coord c : worksheet.keySet()) {
-      String raw = getRaw(c);
+      String raw = getRaw(c.col, c.row);
       try {
         if (!raw.contains("=")) {
           Parser.parse(raw);
@@ -116,7 +117,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
    */
   private boolean hasCycles() {
     for (Coord c : worksheet.keySet()) {
-      String raw = getRaw(c);
+      String raw = getRaw(c.col, c.row);
       if (raw.contains("=")) {
         Sexp sexp = Parser.parse(raw.substring(1));
         if (sexp.accept(new SexpCheckCycles(Parser.parse(c.toString())))) {
