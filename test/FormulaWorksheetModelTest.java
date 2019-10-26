@@ -29,7 +29,7 @@ public class FormulaWorksheetModelTest {
         .createCell(4, 4, "1.00").createCell(5, 4, "4.5")
         .createCell(4, 5, "true").createCell(5, 5, "false")
         .createCell(4, 6, "\"bees\"").createCell(5, 6, "\"friend\"")
-        .createCell(4, 7, "\"true\"").createCell(5, 7, "\"7\"")
+        .createCell(4, 7, "\"true\"").createCell(5, 7, "\"7.0\"")
         .createCell(4, 8, "\"\"hey\"\"").createCell(5, 8, "\"\"")
         .createWorksheet();
   }
@@ -39,10 +39,15 @@ public class FormulaWorksheetModelTest {
    * pairs in {@link Coord}) to val.
    * @param cellString the string corresponding to the cell to be set
    * @param val the value to be set
-   */ //TODO use string splitter stuff to make this work
+   */
   private void setModel(String cellString, String val) {
-    this.model.set(, val);
+    String rowString = cellString.replaceAll("[^0-9]", "");
+    int col = Integer.parseInt(cellString);
+    int row = Integer.parseInt(rowString);
+    this.model.set(col, row, val);
   }
+
+  //TODO write some methods that initialize formulas into the model worksheet we're working with
 
   /** Test for {@link FormulaWorksheetModel#FormulaWorksheetModel(HashMap)}. */
 
@@ -50,7 +55,6 @@ public class FormulaWorksheetModelTest {
   public void constructor_nullArgument() {
     new FormulaWorksheetModel(null);
   }
-
   // All other tests for the constructor are implicit in the builder test suite.
 
   /** Tests for {@link FormulaWorksheetModel.FormulaWorksheetBuilder}. */
@@ -79,7 +83,6 @@ public class FormulaWorksheetModelTest {
   public void builder_canBuildInvalidWorksheets() {
 
   }
-
   // All other tests for the builder are implicit in the below test suite.
 
   /** Tests for {@link FormulaWorksheetModel#set(int, int, String)}. */
@@ -108,8 +111,7 @@ public class FormulaWorksheetModelTest {
   public void set_canMakeInvalidWorksheets() {
 
   }
-
-  // All other tests for set are implicit in the below test suite.
+  // All other tests for set are implicit in all of the below tests.
 
   /** Tests for {@link FormulaWorksheetModel#getEval(int, int)}.
    *
@@ -141,13 +143,38 @@ public class FormulaWorksheetModelTest {
   }
 
   @Test
-  public void getEval_values_string() {
+  public void getEval_values_stringGeneric() {
+
+  }
+
+  @Test
+  public void getEval_values_stringBoolean() {
+
+  }
+
+  @Test
+  public void getEval_values_stringDouble() {
+
+  }
+
+  @Test
+  public void getEval_values_doubleString() {
+
+  }
+
+  @Test
+  public void getEval_values_emptyString() {
 
   }
 
   //* VALUES: Invalid syntax (basically just symbols) *//
   @Test
   public void getEval_values_randomSymbol() {
+
+  }
+
+  @Test
+  public void getEval_values_emptySymbol() {
 
   }
   // Evaluation when symbols are references are covered below.
@@ -279,6 +306,32 @@ public class FormulaWorksheetModelTest {
 
   }
 
+  @Test
+  public void getEval_formulae_ENUM_justNonReferents() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_singleReferents() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_blockReferents() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_mixOfReferents() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_blankCells() {
+
+  }
+
+
   // Functions: Invalid syntax //
   @Test
   public void getEval_formulae_unrecognizedCommand() {
@@ -353,6 +406,16 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void getEval_formulae_LESSTHAN_blankCells() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_noArgs() {
+
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_errorProp() {
 
   }
 
@@ -501,7 +564,6 @@ public class FormulaWorksheetModelTest {
 
   /** Tests for {@link FormulaWorksheetModel#isValid()}. */ //TODO hold off writing these til we
                                                             // figure out whether we need isValid
-
   @Test
   public void isValid_emptySheet() {
 
