@@ -45,15 +45,55 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   @Override
   public String visitSymbol(String s) {
     if (this.isBlockReference(s)) {
-      return this.visitBlockReference();
+      return this.visitBlockReference(s); //HELP BLERNER is this correct syntax for visitor pattern?
+    } else if (this.isReference(s)) {
+      return this.visitReference(s);
+    } else if (this.isError(s)) {
+      return "!#ERROR_REFISERROR";
     } else {
-
+      return "!#ERROR_INVALIDSYMBOL";
     }
   }
 
   @Override
   public String visitString(String s) {
     return "\"" + s + "\"";
+  }
+
+  /**
+   * Evaluates blockRef according to the rules of {@link FormulaWorksheetModel}.
+   * @param blockRef a string representation of a {@link SSymbol} block reference
+   * @return the evaluation of blockRef
+   */
+  protected String visitBlockReference(String blockRef) {
+    return null; //TODO iterate; call visitReference a bunch probably
+  }
+
+  /**
+   * Evaluates ref according to the rules of {@link FormulaWorksheetModel}.
+   * @param ref a string representation of a {@link SSymbol} reference
+   * @return the evaluation of ref
+   */
+  protected String visitReference(String ref) {
+    return null; //TODO
+  }
+
+  /**
+   * Determines whether s is a block reference.
+   * @param s the given string representation of an {@link SSymbol}
+   * @return whether s is a block reference
+   */
+  protected boolean isBlockReference(String s) {
+    return false; //TODO split into strings, determine whether each is a reference
+  }
+
+  /**
+   * Determines whether s is a reference.
+   * @param s the given string representation of an {@link SSymbol}
+   * @return whether s is a reference
+   */
+  protected boolean isReference(String s) {
+    return false; //TODO
   }
 
   /**
