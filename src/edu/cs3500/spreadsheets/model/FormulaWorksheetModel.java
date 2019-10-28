@@ -61,7 +61,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
     if (!raw.contains("=")) {
       return raw;
     }
-    return Parser.parse(raw.substring(1)).accept(new SExpEvaluatorFormulaWorksheet());
+    return Parser.parse(raw.substring(1)).accept(new SExpEvaluatorFormulaWorksheet()).toString();
   }
 
   @Override

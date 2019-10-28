@@ -5,30 +5,45 @@ import java.util.List;
 /**
  * TODO explain why this is here, what it does, and what all of its individual functions do.
  */
-public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
+public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<Sexp> {
 
   @Override
-  public String visitBoolean(boolean b) {
-    return Boolean.toString(b);
+  public Sexp visitBoolean(boolean b) {
+    return Parser.parse(Boolean.toString(b));
   }
 
   @Override
-  public String visitNumber(double d) {
-    return Double.toString(d);
+  public Sexp visitNumber(double d) {
+    return Parser.parse(Double.toString(d));
   }
 
   @Override
-  public String visitSList(List<Sexp> l) {
+  public Sexp visitSList(List<Sexp> l) {
     return null;
   }
 
   @Override
-  public String visitSymbol(String s) {
-    return s; //TODO evaluate cell references
+  public Sexp visitSymbol(String s) {
+    return null;
   }
 
   @Override
-  public String visitString(String s) {
-    return "\"" + s + "\"";
+  public Sexp visitString(String s) {
+    return Parser.parse("\"" + s + "\"");
+  }
+
+  private double sum(Sexp... args) {
+    return 0;
+  }
+
+  private double product(Sexp... args) {
+    return 0;
+  }
+
+  private boolean lessThan(Sexp... args) {
+    if (args.length != 2) { // or if either != SNumber
+      // TODO whatever we want to do with errant function evaluations
+    }
+    return false;
   }
 }
