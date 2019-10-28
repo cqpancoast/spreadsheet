@@ -17,7 +17,7 @@ public class SexpCheckCycles implements SexpVisitor<Boolean> {
   /**
    * Constructs an {@link SexpVisitor} that checks for cycles in the {@link Sexp} of the given cell.
    *
-   * @param sexp   the name of the cell in question as an {@link Sexp}
+   * @param sexp the name of the cell in question as an {@link Sexp}
    */
   public SexpCheckCycles(Sexp sexp) {
     this.sexp = sexp;

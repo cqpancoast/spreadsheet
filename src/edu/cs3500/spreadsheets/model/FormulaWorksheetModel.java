@@ -4,7 +4,6 @@ import edu.cs3500.spreadsheets.model.WorksheetReader.WorksheetBuilder;
 import edu.cs3500.spreadsheets.sexp.Parser;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
-import edu.cs3500.spreadsheets.sexp.SexpCheckCycles;
 import java.util.HashMap;
 
 /** //TODO make all html and pretty
@@ -54,6 +53,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   @Override
   public String getEval(int col, int row) {
+    SExpEvaluatorFormulaWorksheet evaluator = new SExpEvaluatorFormulaWorksheet();
     String raw = getRaw(col, row);
     if (raw == null) {
       return "";
@@ -61,7 +61,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
     if (!raw.contains("=")) {
       return raw;
     }
-    return Parser.parse(raw.substring(1)).accept(new SExpEvaluatorFormulaWorksheet()).toString();
+    return Parser.parse(raw.substring(1)).accept(evaluator);
   }
 
   @Override
@@ -91,42 +91,42 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
     return max;
   }
 
-  @Override
-  public boolean isValid() {
-    for (Coord c : worksheet.keySet()) {
-      String raw = getRaw(c.col, c.row);
-      try {
-        if (!raw.contains("=")) {
-          Parser.parse(raw);
-        }
-        if (raw.contains("=")) {
-          Parser.parse(raw.substring(1));
-        }
-      }
-      catch (IllegalArgumentException e) {
-        return false;
-      }
-
-    }
-    return !hasCycles();
-  }
-
-  /**
-   * Returns whether or not any s-expression in the worksheet contains cycles.
-   * @return whether the worksheet contains cycles
-   */
-  private boolean hasCycles() {
-    for (Coord c : worksheet.keySet()) {
-      String raw = getRaw(c.col, c.row);
-      if (raw.contains("=")) {
-        Sexp sexp = Parser.parse(raw.substring(1));
-        if (sexp.accept(new SexpCheckCycles(Parser.parse(c.toString())))) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+//  @Override NOTE
+//  public boolean isValid() {
+//    for (Coord c : worksheet.keySet()) {
+//      String raw = getRaw(c.col, c.row);
+//      try {
+//        if (!raw.contains("=")) {
+//          Parser.parse(raw);
+//        }
+//        if (raw.contains("=")) {
+//          Parser.parse(raw.substring(1));
+//        }
+//      }
+//      catch (IllegalArgumentException e) {
+//        return false;
+//      }
+//
+//    }
+//    return !hasCycles();
+//  }
+//
+//  /**
+//   * Returns whether or not any s-expression in the worksheet contains cycles.
+//   * @return whether the worksheet contains cycles
+//   */
+//  private boolean hasCycles() {
+//    for (Coord c : worksheet.keySet()) {
+//      String raw = getRaw(c.col, c.row);
+//      if (raw.contains("=")) {
+//        Sexp sexp = Parser.parse(raw.substring(1));
+//        if (sexp.accept(new SexpCheckCycles(Parser.parse(c.toString())))) {
+//          return true;
+//        }
+//      }
+//    }
+//    return false;
+//  }
 
   /**
    * A builder pattern for producing {@link FormulaWorksheetModel}s.

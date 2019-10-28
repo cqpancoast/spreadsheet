@@ -45,11 +45,11 @@ public interface WorksheetModel<T> { //HELP BLERNER how do you feel about our de
    */
   int getMaxColumns();
 
-  /**
-   * Determines whether this worksheet is valid, given any implementation-specific rules, which may
-   * include cell content syntax, cyclic reference, or data type requirements for particular cells.
-   * @return whether this worksheet is valid.
-   */
-  boolean isValid();
+//  /** NOTE
+//   * Determines whether this worksheet is valid, given any implementation-specific rules, which may
+//   * include cell content syntax, cyclic reference, or data type requirements for particular cells.
+//   * @return whether this worksheet is valid.
+//   */
+//  boolean isValid();
 
 }

@@ -12,7 +12,7 @@ import org.junit.Test;
  */
 public class FormulaWorksheetModelTest {
 
-  WorksheetModel<String> model;
+  private WorksheetModel<String> model;
 
   /**
    * Initializes a {@link FormulaWorksheetModel} with valid values roughly arranged into rows by
@@ -224,7 +224,7 @@ public class FormulaWorksheetModelTest {
   }
 
   @Test
-  public void getEval_formulae_errorPropogatesThroughReference() {
+  public void getEval_formulae_errorPropagatesThroughReference() {
 
   }
 
@@ -561,37 +561,37 @@ public class FormulaWorksheetModelTest {
     model.set(6, 3, null);
     assertEquals(0, model.getMaxColumns());
   }
-
-  /** Tests for {@link FormulaWorksheetModel#isValid()}. */ //TODO hold off writing these til we
-                                                            // figure out whether we need isValid
-  @Test
-  public void isValid_emptySheet() {
-
-  }
-
-  @Test
-  public void isValid_genericCall() {
-
-  }
-
-  @Test
-  public void isValid_cyclicReferences() {
-
-  }
-
-  @Test
-  public void isValid_invalidValueSymbol() {
-
-  }
-
-  @Test
-  public void isValid_invalidFunctionArgs() {
-
-  }
-
-  @Test
-  public void isValid_invalidFunctionSyntax() {
-
-  }
+//
+//  /** Tests for {@link FormulaWorksheetModel#isValid()}. */ //TODO hold off writing these til we
+//                                                            // figure out whether we need isValid
+//  @Test
+//  public void isValid_emptySheet() {
+//
+//  }
+//
+//  @Test
+//  public void isValid_genericCall() {
+//
+//  }
+//
+//  @Test
+//  public void isValid_cyclicReferences() {
+//
+//  }
+//
+//  @Test
+//  public void isValid_invalidValueSymbol() {
+//
+//  }
+//
+//  @Test
+//  public void isValid_invalidFunctionArgs() {
+//
+//  }
+//
+//  @Test
+//  public void isValid_invalidFunctionSyntax() {
+//
+//  }
 
 }
