@@ -5,6 +5,7 @@ import edu.cs3500.spreadsheets.model.WorksheetModel;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.Test;
 
 /**
@@ -41,10 +42,8 @@ public class FormulaWorksheetModelTest {
    * @param val the value to be set
    */
   private void setModel(String cellString, String val) {
-    String rowString = cellString.replaceAll("[^0-9]", "");
-    int col = Integer.parseInt(cellString);
-    int row = Integer.parseInt(rowString);
-    this.model.set(col, row, val);
+    List<Integer> fromString = Coord.fromString(cellString);
+    this.model.set(fromString.get(0), fromString.get(1), val);
   }
 
   //TODO write some methods that initialize formulas into the model worksheet we're working with

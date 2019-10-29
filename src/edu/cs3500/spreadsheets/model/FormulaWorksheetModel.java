@@ -35,15 +35,15 @@ import java.util.HashMap;
 public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   private final HashMap<Coord, String> worksheet;
+  private final SExpEvaluatorFormulaWorksheet evaluator = new SExpEvaluatorFormulaWorksheet(this);
 
   /**
    * Constructs a {@link FormulaWorksheetModel}.
-   *
    * @param worksheet  the empty HashMap that will contain the Coord-to-value mappings of the
    *                   worksheet
    */
   public FormulaWorksheetModel(HashMap<Coord, String> worksheet) {
-    this.worksheet = new HashMap<Coord, String>();
+    this.worksheet = worksheet;
   }
 
   @Override
@@ -53,15 +53,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   @Override
   public String getEval(int col, int row) {
-    SExpEvaluatorFormulaWorksheet evaluator = new SExpEvaluatorFormulaWorksheet();
-    String raw = getRaw(col, row);
-    if (raw == null) {
-      return "";
-    }
-    if (!raw.contains("=")) {
-      return raw;
-    }
-    return Parser.parse(raw.substring(1)).accept(evaluator);
+    return evaluator.evaluate(Parser.parse(getRaw(col, row)));
   }
 
   @Override
