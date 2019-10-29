@@ -234,5 +234,4 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       return enumString.toString();
     }
   }
-
 }

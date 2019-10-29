@@ -6,7 +6,7 @@ import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
 import java.util.HashMap;
 
-/** //TODO make all html and pretty
+/**
  * Represents a worksheet in which the raw value type of non-blank cells is a string literal
  * representation of an {@link Sexp}ression. Each of the SExps in question can be a formula or a
  * value, both of which are represented as strings. There is a process of evaluation for cells in
@@ -132,16 +132,21 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
    * A builder pattern for producing {@link FormulaWorksheetModel}s.
    */
   public static class FormulaWorksheetBuilder implements WorksheetBuilder<FormulaWorksheetModel> {
+    private final HashMap<Coord, String> worksheet;
+
+    public FormulaWorksheetBuilder() {
+      this.worksheet = new HashMap<Coord, String>();
+    }
 
     @Override
     public WorksheetBuilder<FormulaWorksheetModel> createCell(int col, int row, String contents) {
-      return null;
+      worksheet.put(new Coord(col, row), contents);
+      return this;
     }
 
     @Override
     public FormulaWorksheetModel createWorksheet() {
-      return null;
+      return new FormulaWorksheetModel(worksheet);
     }
   }
-
 }

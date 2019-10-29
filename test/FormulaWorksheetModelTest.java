@@ -24,7 +24,7 @@ public class FormulaWorksheetModelTest {
    */
   private void initWorksheetData() {
     this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
-        .createCell(4, 2, "0") // the cell with column 4, row 2 is blank.
+        .createCell(4, 2, "0") // the cell with column 5, row 2 is blank.
         .createCell(4, 3, "3").createCell(5, 3, "2")
         .createCell(4, 4, "1.00").createCell(5, 4, "4.5")
         .createCell(4, 5, "true").createCell(5, 5, "false")
