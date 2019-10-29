@@ -41,7 +41,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   }
 
   //TODO if necessary
-  public String evaluate(String s) {
+  public String evaluate(String s) { //TODO write cases for equals sign bullshit
     if (isBlankCell(s)) {
       return this.getBlankCellValue();
     } else {
@@ -104,8 +104,6 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       return this.visitReference(s);
     } else if (isError(s)) {
       return errorRefIsError;
-    } else if (this.hasCycles(s)) {
-      return errorCyclicRef;
     } else {
       return errorInvalidSymbol;
     }
@@ -132,12 +130,11 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @return the evaluation of ref
    */
   protected String visitReference(String ref) {
-    return this.visitReference(ref, new ArrayList<>());
-  }
-
-  protected String visitReference(String ref, List<String> pastRefs) { //TODO figure out cycles!!!
-    List<Integer> fromString = Coord.fromString(ref);
-    return this.model.getEval(fromString.get(0), fromString.get(1));
+    if (this.hasCycles(ref)) {
+      return errorCyclicRef;
+    }
+    List<Integer> refCoord = Coord.fromString(ref);
+    return this.model.getEval(refCoord.get(0), refCoord.get(1));
   }
 
   /**
@@ -196,7 +193,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    */
   private abstract static class SexpEvaluatorAccumulator<T> extends SExpEvaluatorFormulaWorksheet {
 
-    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) {
+    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) { //HELP BLERNER model == null?
       super(model);
     }
 
@@ -503,7 +500,12 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
         return true;
       }
       cellsSoFar.add(s);
-      return false; //TODO recursive call
+      List<Integer> cellCoord = Coord.fromString(s);
+      String refRawString = this.model.getRaw(cellCoord.get(0), cellCoord.get(1));
+      if (refRawString.substring(0, 0).equals("=")) { //TODO equals sign bullshit
+        refRawString = refRawString.substring(1);
+      }
+      return Parser.parse(refRawString).accept(this);
     }
 
     @Override
