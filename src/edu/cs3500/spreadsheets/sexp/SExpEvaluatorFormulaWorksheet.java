@@ -21,6 +21,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   protected final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   protected final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
   protected final String errorRefIsError = "!#ERROR_REFISERROR";
+  protected final String errorCyclicRef = "!#ERROR_CYCLICREF";
   protected final String errorArgIsError = "!#ERROR_ARGISERROR";
   protected final String errorArgType = "!#ERROR_ARGTYPE";
   protected final String errorInvalidArity = "!#ERROR_ARITY";
@@ -39,6 +40,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
     return s.accept(this);
   }
 
+  //TODO if necessary
   public String evaluate(String s) {
     if (isBlankCell(s)) {
       return this.getBlankCellValue();
@@ -102,6 +104,8 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       return this.visitReference(s);
     } else if (isError(s)) {
       return errorRefIsError;
+    } else if (this.hasCycles(s)) {
+      return errorCyclicRef;
     } else {
       return errorInvalidSymbol;
     }
@@ -171,6 +175,16 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   protected static boolean isError(String evalArg) {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
+  }
+
+  /**
+   * Determines whether the reference represented by refString refers to itself recursively in the
+   * worksheet in which the cell is instantiated.
+   * @param refString a string representation of a cell reference
+   * @return whether the cell refers to itself recursively
+   */
+  protected boolean hasCycles(String refString) {
+    return new SexpCheckCycles(this.model).visitSymbol(refString);
   }
 
 
@@ -437,4 +451,65 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       return nextReference;
     }
   }
+
+
+  //* CYCLE CHECKER *//
+
+  /**
+   * The sole field of this class is an {@link Sexp} that is the parsed name of the Coord whose
+   * formula is being checked for cycles.
+   *
+   * This {@link SexpVisitor} determines whether the {@link Sexp} of the Coord in question is found
+   * in its formula's own {@link Sexp}, either directly or indirectly, which would create a cycle.
+   *
+   * The {@link SexpVisitor} returns true if there are cycles, and false if there are not cycles.
+   */
+  public static class SexpCheckCycles implements SexpVisitor<Boolean> {
+    private final FormulaWorksheetModel model;
+    private List<String> cellsSoFar;
+
+    /**
+     * Constructs an {@link SexpVisitor} that checks for cycles in the {@link Sexp} of the given cell.
+     * @param model the {@link FormulaWorksheetModel} in question
+     */
+    public SexpCheckCycles(FormulaWorksheetModel model) {
+      this.model = model;
+      this.cellsSoFar = new ArrayList<>();
+    }
+
+    @Override
+    public Boolean visitBoolean(boolean b) {
+      return false;
+    }
+
+    @Override
+    public Boolean visitNumber(double d) {
+      return false;
+    }
+
+    @Override
+    public Boolean visitSList(List<Sexp> l) {
+      for (Sexp each : l) {
+        if (each.accept(this)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public Boolean visitSymbol(String s) {
+      if (cellsSoFar.contains(s)) {
+        return true;
+      }
+      cellsSoFar.add(s);
+      return false; //TODO recursive call
+    }
+
+    @Override
+    public Boolean visitString(String s) {
+      return false;
+    }
+  }
+
 }
