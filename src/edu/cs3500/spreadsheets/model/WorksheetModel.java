@@ -2,10 +2,10 @@ package edu.cs3500.spreadsheets.model;
 
 /**
  * Represents a worksheet in a spreadsheet application, in which there is a potentially infinite
- * grid with values. Those values can be of any type, given by type param T. This interface supports
+ * grid with values. "Raw" values can be of any type, given by type param T. This interface supports
  * the idea of evaluation, that is, that by some process the evaluated contents of a cell will be
  * different from its raw contents. For ease of display, the evaluated contents are always Strings.
- * @param <T> type of cell contents
+ * @param <T> type of raw cell contents
  */
 public interface WorksheetModel<T> { //HELP BLERNER how do you feel about our design?
 

@@ -1,7 +1,6 @@
 package edu.cs3500.spreadsheets.model;
 
 import edu.cs3500.spreadsheets.model.WorksheetReader.WorksheetBuilder;
-import edu.cs3500.spreadsheets.sexp.Parser;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
 import java.util.HashMap;
@@ -53,16 +52,12 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   @Override
   public String getEval(int col, int row) {
-    return evaluator.evaluate(Parser.parse(getRaw(col, row)));
+    return evaluator.evaluate(getRaw(col, row));
   }
 
   @Override
   public String getRaw(int col, int row) {
-    String raw = worksheet.get(new Coord(col, row));
-    if (raw == null) {
-      return "";
-    }
-    return raw;
+    return worksheet.get(new Coord(col, row));
   }
 
   @Override

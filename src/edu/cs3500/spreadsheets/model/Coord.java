@@ -58,21 +58,27 @@ public class Coord {
    */
   public static List<Integer> fromString(String refString) throws IllegalArgumentException {
     String rowString = refString.replaceAll("[^0-9]", "");
-    return new ArrayList<Integer>(Arrays.asList(Coord.colNameToIndex(refString), rowString)); //TODO
-  }
-
-  /**
-   * Determines whether the symbol s is valid as a reference in a worksheet.
-   * @param s a symbol
-   * @return whether s is a valid reference
-   */
-  public static boolean validReferenceName(String s) { //TODO
-
+    return new ArrayList<Integer>(
+        Arrays.asList(Coord.colNameToIndex(refString), Integer.parseInt(rowString)));
   }
 
   @Override
   public String toString() {
     return colIndexToName(this.col) + this.row;
+  }
+
+  /**
+   * Determines whether the symbol s is valid as a reference in a worksheet.
+   * @param s string representation of a symbol
+   * @return whether s is a valid reference
+   */
+  public static boolean validReferenceName(String s) {
+    try {
+      Coord.fromString(s);
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+    return true;
   }
 
   @Override

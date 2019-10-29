@@ -3,6 +3,8 @@ package edu.cs3500.spreadsheets.sexp;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,7 +16,15 @@ import java.util.List;
 public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
 
   private final FormulaWorksheetModel model;
-  //TODO make all the errors constant strings
+  protected final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
+  protected final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
+  protected final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
+  protected final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
+  protected final String errorRefIsError = "!#ERROR_REFISERROR";
+  protected final String errorArgIsError = "!#ERROR_ARGISERROR";
+  protected final String errorArgType = "!#ERROR_ARGTYPE";
+  protected final String errorInvalidArity = "!#ERROR_ARITY";
+  protected final String errorSyntax = "!#ERROR_SYNTAX";
 
   public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
     this.model = model;
@@ -25,24 +35,24 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @param s a sexp
    * @return evaluated s
    */
-  public String evaluate(Sexp s) { //NOTE something's weird here
-    if (this.isBlankCell(s)) {
-      return this.getBlankCellValue();
-    } else {
-      return s.accept(this);
-    }
+  public String evaluate(Sexp s) { //NOTE do we really need two?
+    return s.accept(this);
   }
 
   public String evaluate(String s) {
-    return this.evaluate(Parser.parse(s));
+    if (isBlankCell(s)) {
+      return this.getBlankCellValue();
+    } else {
+      return this.evaluate(Parser.parse(s));
+    }
   }
 
   /**
-   * Determines whether the given S-exp is a blank cell.
-   * @param s an S-exp
+   * Determines whether the given string representation of a S-exp is a blank cell.
+   * @param s a string rep of a S-exp
    * @return whether string rep of S-exp is of a blank cell
    */
-  protected final boolean isBlankCell(Sexp s) {
+  protected static boolean isBlankCell(String s) {
     return s == null;
   }
 
@@ -67,7 +77,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   @Override
   public String visitSList(List<Sexp> l) {
     if (l.size() < 1) {
-      return "!#ERROR_SYNTAX";
+      return errorSyntax;
     }
     Sexp command = l.remove(0);
     switch (command.accept(this)) {
@@ -80,20 +90,20 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       case "ENUM":
         return new SList(l).accept(new SexpEvaluatorEnum(this.model));
       default:
-        return "!#ERROR_INVALIDCOMMAND";
+        return errorInvalidCommand;
     }
   }
 
   @Override
   public String visitSymbol(String s) {
-    if (this.isBlockReference(s)) {
+    if (isBlockReference(s)) {
       return this.visitBlockReference(s); //HELP BLERNER is this correct syntax for visitor pattern?
-    } else if (this.isReference(s)) {
+    } else if (isReference(s)) {
       return this.visitReference(s);
-    } else if (this.isError(s)) {
-      return "!#ERROR_REFISERROR";
+    } else if (isError(s)) {
+      return errorRefIsError;
     } else {
-      return "!#ERROR_INVALIDSYMBOL";
+      return errorInvalidSymbol;
     }
   }
 
@@ -108,7 +118,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @return the evaluation of blockRef
    */
   protected String visitBlockReference(String blockRef) {
-    return "!#ERROR_INVALIDBLOCKCELLREF";
+    return errorInvalidBlockCellRef;
   }
 
   /**
@@ -131,13 +141,13 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @param s the given string representation of an {@link SSymbol}
    * @return whether s is a block reference
    */
-  protected final boolean isBlockReference(String s) {
+  protected static boolean isBlockReference(String s) {
     String[] refs = s.split(":");
     if (refs.length != 2) {
       return false;
     }
     for (String ref : refs) {
-      if (!this.isReference(ref)) {
+      if (!isReference(ref)) {
         return false;
       }
     }
@@ -149,7 +159,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @param s the given string representation of an {@link SSymbol}
    * @return whether s is a reference
    */
-  protected final boolean isReference(String s) {
+  protected static boolean isReference(String s) {
     return Coord.validReferenceName(s);
   }
 
@@ -158,7 +168,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @param evalArg an evaluated S-exp
    * @return whether string rep of s-exp is an error
    */
-  protected final boolean isError(String evalArg) {
+  protected static boolean isError(String evalArg) {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
   }
@@ -167,68 +177,100 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   //* FUNCTION EVALUATORS *//
 
   /**
+   * A functional operation that accumulates a value by iterating over the arguments. Returns error
+   * symbol if any of the args are errors.
+   */
+  private abstract static class SexpEvaluatorAccumulator<T> extends SExpEvaluatorFormulaWorksheet {
+
+    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) {
+      super(model);
+    }
+
+    /**
+     * Provides an initial value for the accumulator.
+     * @return the initialized value of the accumulative variable
+     */
+    protected abstract T initializeValue();
+
+    /**
+     * Increments this accumulator's accumulative value by some function of evalArg.
+     * @param accumulator the variable that is accumulating
+     * @param evalArg an evaluated argument
+     */
+    protected abstract void accumulate(T accumulator, String evalArg);
+
+    @Override
+    public String visitSList(List<Sexp> args) {
+      T accumulator = this.initializeValue();
+      for (Sexp arg : args) {
+        String evalArg = super.evaluate(arg);
+        if (isError(evalArg)) {
+          if (evalArg.equals(errorArgType)) {
+            return evalArg;
+          }
+          return errorArgIsError;
+        }
+        try {
+          this.accumulate(accumulator, evalArg);
+        } catch (NumberFormatException e) {
+          // Do nothing if arg not parsable as what it should be.
+        }
+      }
+      return accumulator.toString();
+    }
+
+    @Override
+    protected String visitBlockReference(String blockRef) {
+      T blockAccumulator = this.initializeValue();
+      BlockReferenceIterator blockRefs = new BlockReferenceIterator(blockRef);
+      while (blockRefs.hasNext()) {
+        String refEval = this.visitReference(blockRefs.next());
+        if (isError(refEval)) {
+          return errorRefIsError;
+        }
+        try {
+          this.accumulate(blockAccumulator, refEval);
+        } catch (NumberFormatException e) {
+          // Do nothing if arg not parsable as what it should be.
+        }
+      }
+      return blockAccumulator.toString();
+    }
+  }
+
+  /**
    * Sums all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private static final class SexpEvaluatorSum extends SExpEvaluatorFormulaWorksheet {
+  private static final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<Double> {
 
     public SexpEvaluatorSum(FormulaWorksheetModel model) {
       super(model);
     }
 
     @Override
+    protected Double initializeValue() {
+      return 0.0;
+    }
+
+    @Override
+    protected void accumulate(Double accumulator, String evalArg) {
+      accumulator += Double.parseDouble(evalArg); //HELP never used? It's used in parent class
+    }
+
+    @Override
     public String visitBoolean(boolean b) {
-      return "!#ERROR_ARGTYPE";
-    }
-
-    @Override
-    public String visitNumber(double d) {
-      return String.valueOf(d);
-    }
-
-    @Override
-    public String visitSList(List<Sexp> args) {
-      double sumTotal = 0;
-      for (Sexp arg : args) {
-        String evalArg = this.evaluate(arg);
-        if (this.isError(evalArg)) {
-          if (evalArg.equals("!#ERROR_ARGTYPE")) {
-            return evalArg;
-          }
-          return "!#ERROR_ARGISERROR";
-        }
-        try {
-            sumTotal += Double.parseDouble(evalArg);
-          } catch (NumberFormatException e) {
-            // Do nothing if arg not parsable as a double.
-          }
-        }
-      return String.valueOf(sumTotal);
+      return errorArgType;
     }
 
     @Override
     public String visitString(String s) {
-      return "!#ERROR_ARGTYPE";
+      return errorArgType;
     }
 
     @Override
     protected final String getBlankCellValue() {
       return "0";
-    }
-
-    @Override
-    protected String visitBlockReference(String blockRef) {
-      double blockSumTotal = 0;
-      BlockReferenceIterator blockRefs = new BlockReferenceIterator(blockRef);
-      while (blockRefs.hasNext()) {
-        String ref = blockRefs.next();
-        String refEval = this.evaluate(ref);
-        if (this.isError(refEval)) {
-          return "!#ERROR_REFISERROR";
-        }
-        blockSumTotal += Double.parseDouble(refEval);
-      }
-      return String.valueOf(blockSumTotal);
     }
 
   }
@@ -237,27 +279,35 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * Multiplies all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private static final class SexpEvaluatorProduct extends SExpEvaluatorFormulaWorksheet {
+  private static final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<Double> {
 
     public SexpEvaluatorProduct(FormulaWorksheetModel model) {
       super(model);
     }
 
     @Override
-    public String visitSList(List<Sexp> args) {
-      double productTotal = 0;
-      for (Sexp arg : args) {
-        String evalArg = this.evaluate(arg);
-        if (this.isError(evalArg)) {
-          return "!#ERROR_ARGISERROR";
-        }
-        try {
-          productTotal *= Double.parseDouble(evalArg);
-        } catch (NumberFormatException e) {
-          // Do nothing if arg not parsable as a double.
-        }
-      }
-      return String.valueOf(productTotal);
+    protected Double initializeValue() {
+      return 0.0;
+    }
+
+    @Override
+    protected void accumulate(Double accumulator, String evalArg) {
+      accumulator *= Double.parseDouble(evalArg); //HELP never used? It's used in parent class
+    }
+
+    @Override
+    public String visitBoolean(boolean b) {
+      return errorArgType;
+    }
+
+    @Override
+    public String visitString(String s) {
+      return errorArgType;
+    }
+
+    @Override
+    protected final String getBlankCellValue() {
+      return "0";
     }
   }
 
@@ -269,7 +319,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * - either size of args is anything other than two.
    * - either of the args are not interpretable as doubles.
    */
-  private final static class SexpEvaluatorLessThan extends SExpEvaluatorFormulaWorksheet {
+  private static final class SexpEvaluatorLessThan extends SExpEvaluatorFormulaWorksheet {
 
     public SexpEvaluatorLessThan(FormulaWorksheetModel model) {
       super(model);
@@ -278,46 +328,60 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
     @Override
     public String visitSList(List<Sexp> args) {
       if (args.size() != 2) {
-        return "!#ERROR_WRONGARITY";
+        return errorInvalidArity;
       }
-      Sexp arg1 = args.get(0);
-      Sexp arg2 = args.get(1);
-      if (this.isBlankCell(arg1) || this.isBlankCell(arg2)) {
-        return "!#ERROR_INVALIDBLANKCELLREF";
+      String arg1Eval = super.evaluate(args.get(0));
+      String arg2Eval = super.evaluate(args.get(1));
+      if (isBlankCell(arg1Eval) || isBlankCell(arg2Eval)) {
+        return errorInvalidBlankCellRef;
       }
-      if (this.isError(evalArg1) || this.isError(evalArg2)) {
-        return "!#ERROR_ARGISERROR";
+      if (isError(arg1Eval) || isError(arg2Eval)) {
+        return errorArgIsError;
       } try {
-        return String.valueOf(Double.parseDouble(evalArg1) < Double.parseDouble(evalArg2));
+        return String.valueOf(Double.parseDouble(arg1Eval) < Double.parseDouble(arg2Eval));
       } catch (NumberFormatException e) {
-        return "!#ERROR_WRONGARGTYPE";
+        return errorArgType;
       }
+    }
+
+    @Override
+    public String visitString(String s) {
+      return errorArgType;
+    }
+
+    @Override
+    public String visitNumber(double d) {
+      return errorArgType;
+    }
+
+    @Override
+    protected final String getBlankCellValue() {
+      return errorInvalidBlankCellRef;
     }
   }
 
   /**
    * Lists all of the args separated by spaces. Returns error symbol if any of the args are errors.
    */
-  private final static class SexpEvaluatorEnum extends SExpEvaluatorFormulaWorksheet {
+  private static final class SexpEvaluatorEnum extends SexpEvaluatorAccumulator<StringBuilder> {
 
     public SexpEvaluatorEnum(FormulaWorksheetModel model) {
       super(model);
     }
 
     @Override
-    public String visitSList(List<Sexp> args) {
-      StringBuilder enumString = new StringBuilder();
-      for (Sexp arg : args) {
-        String evalArg = arg.accept(this);
-        if (this.isError(evalArg)) {
-          return "!#ERROR_ARGISERROR";
-        } else if (this.isBlankCell(arg)) { //NOTE why is it always false!?
-          evalArg = "<blank>";
-        }
-        enumString.append(evalArg).append(" ");
-      }
-      enumString.trimToSize();
-      return enumString.toString();
+    protected StringBuilder initializeValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    protected void accumulate(StringBuilder accumulator, String evalArg) {
+      accumulator.append(evalArg).append(" ");
+    }
+
+    @Override
+    protected final String getBlankCellValue() {
+      return "<blank>";
     }
   }
 
@@ -325,25 +389,52 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * Given a string specifying worksheet cells that are at the corners of some region, iterates over
    * the cells in that region.
    */
-  private final static class BlockReferenceIterator implements Iterator<String> { //TODO
+  private final static class BlockReferenceIterator implements Iterator<String> {
 
-    private final int startCol, startRow, endCol, endRow;
+    private final int startCol, startRow, endCol, endRow; //HELP BLERNER it's small, but should I follow IntelliJ's advice here?
     private int col, row;
 
-    BlockReferenceIterator(String blockRef) {
-      //TODO
-      col = Math.min(this.startCol, this.endCol);
-      row = Math.min(this.startRow, this.endRow);
+    /**
+     * Creates a new {@link BlockReferenceIterator}.
+     * @param blockRef a string representing a reference to a block of cells
+     */
+    private BlockReferenceIterator(String blockRef) { //HELP BLERNER What does private mean here?
+      if (!isBlockReference(blockRef)) {
+        throw new IllegalArgumentException("Received invalid block reference string.");
+      }
+
+      String[] refs = blockRef.split(":");
+      List<Integer> firstRefCoord = Coord.fromString(refs[0]);
+      List<Integer> secondRefCoord = Coord.fromString(refs[1]);
+      List<Integer> cols
+          = new ArrayList<>(Arrays.asList(firstRefCoord.get(0), secondRefCoord.get(0)));
+      List<Integer> rows
+          = new ArrayList<>(Arrays.asList(firstRefCoord.get(1), secondRefCoord.get(1)));
+      Collections.sort(cols);
+      Collections.sort(rows);
+
+      this.startCol = cols.get(0);
+      this.startRow = rows.get(0);
+      this.endCol = cols.get(1);
+      this.endRow = rows.get(1);
+      this.col = this.startCol;
+      this.row = this.startRow;
     }
 
     @Override
     public boolean hasNext() {
-      return false;
+      return this.row <= endRow;
     }
 
     @Override
     public String next() {
-      return null;
+      String nextReference = Coord.colIndexToName(this.col) + this.row;
+      this.col += 1;
+      if (this.col > this.endCol) {
+        this.col = this.startCol;
+        this.row += 1;
+      }
+      return nextReference;
     }
   }
 }
