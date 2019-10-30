@@ -16,16 +16,16 @@ import java.util.List;
 public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
 
   private final FormulaWorksheetModel model;
-  protected final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
-  protected final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
-  protected final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
-  protected final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
-  protected final String errorRefIsError = "!#ERROR_REFISERROR";
-  protected final String errorCyclicRef = "!#ERROR_CYCLICREF";
-  protected final String errorArgIsError = "!#ERROR_ARGISERROR";
-  protected final String errorArgType = "!#ERROR_ARGTYPE";
-  protected final String errorInvalidArity = "!#ERROR_ARITY";
-  protected final String errorSyntax = "!#ERROR_SYNTAX";
+  protected static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF"; //HELP BLERNER copy-paste?
+  protected static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
+  protected static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
+  protected static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
+  protected static final String errorRefIsError = "!#ERROR_REFISERROR";
+  protected static final String errorCyclicRef = "!#ERROR_CYCLICREF";
+  protected static final String errorArgIsError = "!#ERROR_ARGISERROR";
+  protected static final String errorArgType = "!#ERROR_ARGTYPE";
+  protected static final String errorInvalidArity = "!#ERROR_ARITY";
+  protected static final String errorSyntax = "!#ERROR_SYNTAX";
 
   public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
     if (model == null) {
@@ -115,8 +115,8 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       return errorSyntax;
     }
     Sexp command = l.get(0);
-    List<Sexp> args = l.subList(1, l.size() - 1);
-    switch (command.accept(this)) {
+    List<Sexp> args = l.subList(1, l.size());
+    switch (command.toString()) {
       case "SUM":
         return new SList(args).accept(new SexpEvaluatorSum(this.model));
       case "PRODUCT":
@@ -256,7 +256,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
           return errorArgIsError;
         }
         try {
-          this.accumulate(accumulator, evalArg);
+          this.accumulate(accumulator, evalArg); //FIXME
         } catch (NumberFormatException e) {
           // Do nothing if arg not parsable as what it should be.
         }

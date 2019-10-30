@@ -14,6 +14,16 @@ import org.junit.Test;
 public class FormulaWorksheetModelTest {
 
   private WorksheetModel<String> model;
+  private static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF"; //HELP BLERNER copy-paste?
+  private static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
+  private static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
+  private static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
+  private static final String errorRefIsError = "!#ERROR_REFISERROR";
+  private static final String errorCyclicRef = "!#ERROR_CYCLICREF";
+  private static final String errorArgIsError = "!#ERROR_ARGISERROR";
+  private static final String errorArgType = "!#ERROR_ARGTYPE";
+  private static final String errorInvalidArity = "!#ERROR_ARITY";
+  private static final String errorSyntax = "!#ERROR_SYNTAX";
 
   /**
    * Initializes a {@link FormulaWorksheetModel} with valid values roughly arranged into rows by
@@ -41,9 +51,27 @@ public class FormulaWorksheetModelTest {
    * @param cellString the string corresponding to the cell to be set
    * @param val the value to be set
    */
-  private void setModel(String cellString, String val) {
+  private void setModel(String cellString, String val) { //NOTE return value to be set?
     List<Integer> fromString = Coord.fromString(cellString);
     this.model.set(fromString.get(0), fromString.get(1), val);
+  }
+
+  /**
+   * Gets the raw contents of the cell corresponding to cellString.
+   * @param cellString the string corresponding to the cell to be accessed
+   */
+  private String getRawModel(String cellString) {
+    List<Integer> fromString = Coord.fromString(cellString);
+    return this.model.getRaw(fromString.get(0), fromString.get(1));
+  }
+
+  /**
+   * Gets the evaluated contents the cell corresponding to cellString.
+   * @param cellString the string corresponding to the cell to be accessed
+   */
+  private String getEvalModel(String cellString) {
+    List<Integer> fromString = Coord.fromString(cellString);
+    return this.model.getEval(fromString.get(0), fromString.get(1));
   }
 
   //TODO write some methods that initialize formulas into the model worksheet we're working with
@@ -98,7 +126,10 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void set_overwrittenCells() {
-
+    this.initWorksheetData();
+    assertEquals("0", getRawModel("D2"));
+    setModel("D2", "\"newValue\"");
+    assertEquals("\"newValue\"", getRawModel("D2"));
   }
 
   @Test
@@ -213,13 +244,25 @@ public class FormulaWorksheetModelTest {
 
   //* FORMULAE: Just references *//
   @Test
-  public void getEval_formulae_valueReference() {
+  public void getEval_formulae_blankReference() {
+    this.initWorksheetData();
+    setModel("C2", "=A1");
+    assertEquals("", getEvalModel("C2"));
+  }
 
+  @Test
+  public void getEval_formulae_valueReference() {
+    this.initWorksheetData();
+    setModel("C2", "=D6");
+    assertEquals("\"bees\"", getEvalModel("C2"));
   }
 
   @Test
   public void getEval_formulae_formulaReference() {
-
+    this.initWorksheetData();
+    setModel("C2", "=C3");
+    setModel("C3", "=(SUM 4 3.2 -1)");
+    assertEquals("6.2", getEvalModel("C2"));
   }
 
   @Test
@@ -237,16 +280,19 @@ public class FormulaWorksheetModelTest {
 
   }
 
+  @Test
+  public void getEval_formulae_referenceCannotBeInParens() {
+
+  }
+
   //* FORMULAE: Functions *//
 
   // Functions: Things go right //
   @Test
   public void getEval_formulae_SUM_justNonReferents() {
     initWorksheetData();
-    //setModel("A2", "=(SUM 8 5)");
-    setModel("A3", "=(SUM -4 7)");
-    setModel("A4", "=(SUM -2 -5)");
-    assertEquals("13", model.getEval(1, 2));
+    setModel("C2", "=(SUM 4 3.2 -1)");
+    assertEquals("6.2", getEvalModel("C2"));
   }
 
   @Test
@@ -345,11 +391,12 @@ public class FormulaWorksheetModelTest {
 
   }
 
-
   // Functions: Invalid syntax //
   @Test
   public void getEval_formulae_unrecognizedCommand() {
-
+    this.initWorksheetData();
+    setModel("C2", "=(BEES 4 \"seventy\")");
+    assertEquals(errorInvalidCommand, getEvalModel("C2"));
   }
 
   @Test

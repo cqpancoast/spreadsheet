@@ -54,12 +54,19 @@ public class Coord {
    * Converts the given reference string into a two-element list with the structure {col, row}.
    * @param refString the string representation of a {@link Coord}
    * @return a list {col, row} corresponding to the given reference string
-   * @throws IllegalArgumentException if refString is not a well formed reference string
    */
-  public static List<Integer> fromString(String refString) throws IllegalArgumentException {
+  public static List<Integer> fromString(String refString) {
+    if (!validReferenceName(refString)) {
+      throw new IllegalArgumentException("Invalid reference string.");
+    }
     String rowString = refString.replaceAll("[^0-9]", "");
-    return new ArrayList<Integer>(
-        Arrays.asList(Coord.colNameToIndex(refString), Integer.parseInt(rowString)));
+    String colString = refString.replaceAll("[^A-Z]", "");
+    try {
+      return new ArrayList<Integer>(
+          Arrays.asList(Coord.colNameToIndex(colString), Integer.parseInt(rowString)));
+    } catch (Exception e) {
+      throw new IllegalArgumentException("The given string was not a well formed reference string.");
+    }
   }
 
   @Override
@@ -72,12 +79,7 @@ public class Coord {
    * @param s string representation of a symbol
    * @return whether s is a valid reference
    */
-  public static boolean validReferenceName(String s) {
-    try {
-      Coord.fromString(s);
-    } catch (IllegalArgumentException e) {
-      return false;
-    }
+  public static boolean validReferenceName(String s) { //TODO
     return true;
   }
 
