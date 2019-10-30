@@ -28,24 +28,40 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   protected final String errorSyntax = "!#ERROR_SYNTAX";
 
   public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
+    if (model == null) {
+      throw new IllegalArgumentException("Evaluator constructor received null model.");
+    }
     this.model = model;
   }
 
   /**
-   * Evaluates s according to the rules of {@link FormulaWorksheetModel}.
-   * @param s a sexp
+   * Evaluates sexp according to the rules of {@link FormulaWorksheetModel}.
+   * @param sexp a sexp
    * @return evaluated s
    */
-  public String evaluate(Sexp s) { //NOTE do we really need two?
-    return s.accept(this);
+  public String evaluate(Sexp sexp) { //NOTE do we really need two?
+    return sexp.accept(this);
   }
 
-  //TODO if necessary
-  public String evaluate(String s) { //TODO write cases for equals sign bullshit
+  /**
+   * Evaluates s according to the rules of {@link FormulaWorksheetModel}, pre-processing it into a
+   * form where it can be evaluated as a sexp or returning an error symbol if it cannot be.
+   * @param s the raw contents of a cell
+   * @return the evaluation of s
+   */
+  public String evaluate(String s) {
     if (isBlankCell(s)) {
       return this.getBlankCellValue();
-    } else {
-      return this.evaluate(Parser.parse(s));
+    }
+    String processedRaw = this.processRawValue(s);
+    if (isError(processedRaw)) {
+      return processedRaw;
+    }
+    try {
+      Sexp parsedSexp = Parser.parse(processedRaw);
+      return this.evaluate(parsedSexp);
+    } catch (IllegalArgumentException e) {
+      return errorSyntax;
     }
   }
 
@@ -64,6 +80,23 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    */
   protected String getBlankCellValue() {
     return "";
+  }
+
+  /**
+   * Ensures that the raw value has the correct syntax with respect to equals signs and formulae.
+   * Returns syntax error symbol if raw begins with an open paren, removes equals sign if raw begins
+   * with one. THIS DOES NOT ENSURE THAT RAW IS PARSABLE, OR HAS THE CORRECT SYNTAX IN GENERAL.
+   * @param raw raw contents of a cell
+   * @return processed string value or error symbol
+   */
+  private String processRawValue(String raw) {
+    if (raw.indexOf("=") == 0) {
+      return raw.substring(1);
+    } else if (raw.indexOf("(") == 0) {
+      return errorSyntax;
+    } else {
+      return raw;
+    }
   }
 
   @Override
