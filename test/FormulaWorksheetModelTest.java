@@ -24,7 +24,7 @@ public class FormulaWorksheetModelTest {
    * functions and data in column B, etc. //TODO provide link to image on imgur or something?
    */
   private void initWorksheetData() {
-    this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
+    this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder().createCell(1, 2, "=(SUM 5 8)")
         .createCell(4, 2, "0") // the cell with column 5, row 2 is blank.
         .createCell(4, 3, "3").createCell(5, 3, "2")
         .createCell(4, 4, "1.00").createCell(5, 4, "4.5")
@@ -242,22 +242,37 @@ public class FormulaWorksheetModelTest {
   // Functions: Things go right //
   @Test
   public void getEval_formulae_SUM_justNonReferents() {
-
+    initWorksheetData();
+    //setModel("A2", "=(SUM 8 5)");
+    setModel("A3", "=(SUM -4 7)");
+    setModel("A4", "=(SUM -2 -5)");
+    assertEquals("13", model.getEval(1, 2));
   }
 
   @Test
   public void getEval_formulae_SUM_singleReferents() {
-
+    initWorksheetData();
+    setModel("A2", "=(SUM D3 5)");
+    setModel("A3", "=(SUM -6 D4)");
+    setModel("A4", "=(SUM E3 1.9)");
   }
 
   @Test
   public void getEval_formulae_SUM_blockReferents() {
-
+    initWorksheetData();
+    setModel("A2", "=(SUM D3:E3)");
+    setModel("A3", "=(SUM E3:E4)");
+    setModel("A4", "=(SUM D3:E4)");
   }
 
   @Test
   public void getEval_formulae_SUM_mixOfReferents() {
-
+    initWorksheetData();
+    setModel("A2", "=(SUM D3:E4 4.2)");
+    setModel("A3", "=(SUM D3:E4 D3)");
+    setModel("A4", "=(SUM (SUM D3:E4) 13.2 (SUM E3:E4))");
+    setModel("A5", "=A6");
+    setModel("A6", "=(SUM D3 E4)");
   }
 
   @Test

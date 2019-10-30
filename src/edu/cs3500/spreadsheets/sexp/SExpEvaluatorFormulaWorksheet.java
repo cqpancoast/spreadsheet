@@ -114,16 +114,17 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
     if (l.size() < 1) {
       return errorSyntax;
     }
-    Sexp command = l.remove(0);
+    Sexp command = l.get(0);
+    List<Sexp> args = l.subList(1, l.size() - 1);
     switch (command.accept(this)) {
       case "SUM":
-        return new SList(l).accept(new SexpEvaluatorSum(this.model));
+        return new SList(args).accept(new SexpEvaluatorSum(this.model));
       case "PRODUCT":
-        return new SList(l).accept(new SexpEvaluatorProduct(this.model));
+        return new SList(args).accept(new SexpEvaluatorProduct(this.model));
       case "<":
-        return new SList(l).accept(new SexpEvaluatorLessThan(this.model));
+        return new SList(args).accept(new SexpEvaluatorLessThan(this.model));
       case "ENUM":
-        return new SList(l).accept(new SexpEvaluatorEnum(this.model));
+        return new SList(args).accept(new SexpEvaluatorEnum(this.model));
       default:
         return errorInvalidCommand;
     }
