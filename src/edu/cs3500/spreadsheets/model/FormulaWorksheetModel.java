@@ -42,6 +42,9 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
    *                   worksheet
    */
   public FormulaWorksheetModel(HashMap<Coord, String> worksheet) {
+    if (worksheet == null) {
+      throw new IllegalArgumentException("Received null worksheet as constructor argument."); //NOTE Checked or unchecked?
+    }
     this.worksheet = worksheet;
   }
 

@@ -34,7 +34,7 @@ public class FormulaWorksheetModelTest {
    * functions and data in column B, etc. //TODO provide link to image on imgur or something?
    */
   private void initWorksheetData() {
-    this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder().createCell(1, 2, "=(SUM 5 8)")
+    this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
         .createCell(4, 2, "0") // the cell with column 5, row 2 is blank.
         .createCell(4, 3, "3").createCell(5, 3, "2")
         .createCell(4, 4, "1.00").createCell(5, 4, "4.5")
@@ -285,13 +285,18 @@ public class FormulaWorksheetModelTest {
 
   }
 
+  @Test
+  public void getEval_formulae_justReferenceMustBeginWithEqualsSign() {
+
+  }
+
   //* FORMULAE: Functions *//
 
   // Functions: Things go right //
   @Test
   public void getEval_formulae_SUM_justNonReferents() {
     initWorksheetData();
-    setModel("C2", "=(SUM 4 3.2 -1)");
+    setModel("C2", "=(SUM 4 3.2 -1.00)");
     assertEquals("6.2", getEvalModel("C2"));
   }
 
@@ -571,7 +576,6 @@ public class FormulaWorksheetModelTest {
     assertEquals(3002, model.getMaxRows());
     model.set(3001, 3003, "=(ENUMERATE asdf)");
     assertEquals(3003, model.getMaxRows());
-    assertEquals(3001, model.getMaxRows());
     model.set(3001, 3001, null);
     model.set(3001, 3002, null);
     model.set(3001, 3003, null);
@@ -585,7 +589,7 @@ public class FormulaWorksheetModelTest {
   @Test
   public void getMaxColumns_genericCall() {
     this.initWorksheetData();
-    assertEquals(8, model.getMaxColumns());
+    assertEquals(5, model.getMaxColumns());
     model.set(100, 102, "0");
     assertEquals(100, model.getMaxColumns());
   }
@@ -593,7 +597,7 @@ public class FormulaWorksheetModelTest {
   @Test
   public void getMaxColumns_countsBadSyntax() {
     this.initWorksheetData();
-    assertEquals(8, model.getMaxColumns());
+    assertEquals(5, model.getMaxColumns());
     model.set(100, 102, "INVALID SYMBOL");
     assertEquals(100, model.getMaxColumns());
   }
@@ -614,7 +618,6 @@ public class FormulaWorksheetModelTest {
     assertEquals(3002, model.getMaxColumns());
     model.set(3003, 3001, "=(ENUMERATE asdf)");
     assertEquals(3003, model.getMaxColumns());
-    assertEquals(3001, model.getMaxColumns());
     model.set(3001, 3001, null);
     model.set(3002, 3001, null);
     model.set(3003, 3001, null);

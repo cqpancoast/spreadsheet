@@ -9,13 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A visitor to evaluate string-represented {@link Sexp} values in a worksheet according to the
- * rules of {@link FormulaWorksheetModel}. If the evaluation results in an error, the returned
- * string representation of an {@link SSymbol} has the form !#ERROR_[ERRORDESCRIPTION].
+ * A visitor to evaluate string-represented {@link Sexp} values in a worksheet.
+ * @param <T> return type of the evaluator
  */
-public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
+public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
 
-  private final FormulaWorksheetModel model;
   protected static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF"; //HELP BLERNER copy-paste?
   protected static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   protected static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
@@ -27,33 +25,17 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
   protected static final String errorInvalidArity = "!#ERROR_ARITY";
   protected static final String errorSyntax = "!#ERROR_SYNTAX";
 
-  public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
-    if (model == null) {
-      throw new IllegalArgumentException("Evaluator constructor received null model.");
-    }
-    this.model = model;
-  }
-
-  /**
-   * Evaluates sexp according to the rules of {@link FormulaWorksheetModel}.
-   * @param sexp a sexp
-   * @return evaluated s
-   */
-  public String evaluate(Sexp sexp) { //NOTE do we really need two?
-    return sexp.accept(this);
-  }
-
   /**
    * Evaluates s according to the rules of {@link FormulaWorksheetModel}, pre-processing it into a
    * form where it can be evaluated as a sexp or returning an error symbol if it cannot be.
    * @param s the raw contents of a cell
    * @return the evaluation of s
    */
-  public String evaluate(String s) {
+  public T evaluate(String s) {
     if (isBlankCell(s)) {
       return this.getBlankCellValue();
     }
-    String processedRaw = this.processRawValue(s);
+    String processedRaw = processRawValue(s);
     if (isError(processedRaw)) {
       return processedRaw;
     }
@@ -78,9 +60,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * Gets what the value of a blank cell should be, according to the rules of evaluation.
    * @return value of a blank cell
    */
-  protected String getBlankCellValue() {
-    return "";
-  }
+  protected abstract T getBlankCellValue();
 
   /**
    * Ensures that the raw value has the correct syntax with respect to equals signs and formulae.
@@ -89,7 +69,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @param raw raw contents of a cell
    * @return processed string value or error symbol
    */
-  private String processRawValue(String raw) {
+  protected static String processRawValue(String raw) { //TODO require that references begin with equals signs
     if (raw.indexOf("=") == 0) {
       return raw.substring(1);
     } else if (raw.indexOf("(") == 0) {
@@ -97,6 +77,112 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
     } else {
       return raw;
     }
+  }
+
+  /**
+   * Determines whether s is a block reference.
+   * @param s the given string representation of an {@link SSymbol}
+   * @return whether s is a block reference
+   */
+  protected static boolean isBlockReference(String s) {
+    String[] refs = s.split(":");
+    if (refs.length != 2) {
+      return false;
+    }
+    for (String ref : refs) {
+      if (!isReference(ref)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether s is a reference.
+   * @param s the given string representation of an {@link SSymbol}
+   * @return whether s is a reference
+   */
+  protected static boolean isReference(String s) {
+    return Coord.validReferenceName(s);
+  }
+
+  /**
+   * Determines whether the given evaluated S-exp is an error.
+   * @param evalArg an evaluated S-exp
+   * @return whether string rep of s-exp is an error
+   */
+  protected static boolean isError(String evalArg) {
+    String[] splitMaybeError = evalArg.split("_");
+    return splitMaybeError[0].equals("!#ERROR");
+  }
+
+  @Override
+  public abstract T visitBoolean(boolean b);
+
+  @Override
+  public abstract T visitNumber(double d);
+
+  @Override
+  public abstract T visitSList(List<Sexp> l);
+
+  @Override
+  public abstract T visitSymbol(String s);
+
+  @Override
+  public abstract T visitString(String s);
+
+}
+
+/**
+ * A visitor to evaluate string-represented {@link Sexp} values in a worksheet according to the
+ * rules of {@link FormulaWorksheetModel}. If the evaluation results in an error, the returned
+ * string representation of an {@link SSymbol} has the form !#ERROR_[ERRORDESCRIPTION].
+ */
+public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
+
+  private final FormulaWorksheetModel model;
+
+  public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
+    if (model == null) {
+      throw new IllegalArgumentException("Evaluator constructor received null model.");
+    }
+    this.model = model;
+  }
+
+  /**
+   * Evaluates sexp according to the rules of {@link FormulaWorksheetModel}.
+   * @param sexp a sexp
+   * @return evaluated s
+   */
+  public String evaluate(Sexp sexp) { //NOTE do we really need two?
+    return sexp.accept(this);
+  }
+
+//  /**
+//   * Evaluates s according to the rules of {@link FormulaWorksheetModel}, pre-processing it into a
+//   * form where it can be evaluated as a sexp or returning an error symbol if it cannot be.
+//   * @param s the raw contents of a cell
+//   * @return the evaluation of s
+//   */
+//  public String evaluate(String s) {
+//    if (isBlankCell(s)) {
+//      return getBlankCellValue();
+//    }
+//    String processedRaw = processRawValue(s);
+//    if (isError(processedRaw)) {
+//      return processedRaw;
+//    }
+//    try {
+//      Sexp parsedSexp = Parser.parse(processedRaw);
+//      return this.evaluate(parsedSexp);
+//    } catch (IllegalArgumentException e) {
+//      return errorSyntax;
+//    }
+//  }
+
+  @Override
+  protected String getBlankCellValue() {
+    return "";
   }
 
   @Override
@@ -164,48 +250,11 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    * @return the evaluation of ref
    */
   protected String visitReference(String ref) {
-    if (this.hasCycles(ref)) {
+    if (this.hasCycles(ref)) { //NOTE error
       return errorCyclicRef;
     }
     List<Integer> refCoord = Coord.fromString(ref);
     return this.model.getEval(refCoord.get(0), refCoord.get(1));
-  }
-
-  /**
-   * Determines whether s is a block reference.
-   * @param s the given string representation of an {@link SSymbol}
-   * @return whether s is a block reference
-   */
-  protected static boolean isBlockReference(String s) {
-    String[] refs = s.split(":");
-    if (refs.length != 2) {
-      return false;
-    }
-    for (String ref : refs) {
-      if (!isReference(ref)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Determines whether s is a reference.
-   * @param s the given string representation of an {@link SSymbol}
-   * @return whether s is a reference
-   */
-  protected static boolean isReference(String s) {
-    return Coord.validReferenceName(s);
-  }
-
-  /**
-   * Determines whether the given evaluated S-exp is an error.
-   * @param evalArg an evaluated S-exp
-   * @return whether string rep of s-exp is an error
-   */
-  protected static boolean isError(String evalArg) {
-    String[] splitMaybeError = evalArg.split("_");
-    return splitMaybeError[0].equals("!#ERROR");
   }
 
   /**
@@ -495,7 +544,7 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
    *
    * The {@link SexpVisitor} returns true if there are cycles, and false if there are not cycles.
    */
-  public static class SexpCheckCycles implements SexpVisitor<Boolean> {
+  public static class SexpCheckCycles extends SexpEvaluator<Boolean> {
     private final FormulaWorksheetModel model;
     private List<String> cellsSoFar;
 
@@ -506,6 +555,11 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
     public SexpCheckCycles(FormulaWorksheetModel model) {
       this.model = model;
       this.cellsSoFar = new ArrayList<>();
+    }
+
+    @Override
+    protected Boolean getBlankCellValue() {
+      return false;
     }
 
     @Override
@@ -536,10 +590,9 @@ public class SExpEvaluatorFormulaWorksheet implements SexpVisitor<String> {
       cellsSoFar.add(s);
       List<Integer> cellCoord = Coord.fromString(s);
       String refRawString = this.model.getRaw(cellCoord.get(0), cellCoord.get(1));
-      if (refRawString.substring(0, 0).equals("=")) { //TODO equals sign bullshit
-        refRawString = refRawString.substring(1);
-      }
+      refRawString = SExpEvaluatorFormulaWorksheet.processRawValue(refRawString);
       return Parser.parse(refRawString).accept(this);
+      return
     }
 
     @Override
