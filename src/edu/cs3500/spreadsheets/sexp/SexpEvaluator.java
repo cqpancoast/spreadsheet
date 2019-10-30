@@ -26,7 +26,8 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param sexp a sexp
    * @return evaluated s
    */
-  public T evaluate(Sexp sexp) { //NOTE do we really need two?
+  public T evaluate(Sexp sexp) {
+    //System.out.println(sexp);
     return sexp.accept(this);
   }
 
@@ -128,20 +129,4 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
   }
-
-  @Override
-  public abstract T visitBoolean(boolean b);
-
-  @Override
-  public abstract T visitNumber(double d);
-
-  @Override
-  public abstract T visitSList(List<Sexp> l);
-
-  @Override
-  public abstract T visitSymbol(String s);
-
-  @Override
-  public abstract T visitString(String s);
-
 }

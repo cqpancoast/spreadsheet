@@ -296,104 +296,207 @@ public class FormulaWorksheetModelTest {
   @Test
   public void getEval_formulae_SUM_justNonReferents() {
     initWorksheetData();
-    setModel("C2", "=(SUM 4 3.2 -1.00)");
+    setModel("C2", "=(SUM 4 3.2 -1.0)");
+    setModel("C3", "=(SUM 5 8)");
+    setModel("C4", "=(SUM 4.2 -7)");
     assertEquals("6.2", getEvalModel("C2"));
+    assertEquals("13.0", getEvalModel("C3"));
+    assertEquals("-2.8", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_SUM_singleReferents() {
     initWorksheetData();
-    setModel("A2", "=(SUM D3 5)");
-    setModel("A3", "=(SUM -6 D4)");
-    setModel("A4", "=(SUM E3 1.9)");
+    setModel("C2", "=(SUM D3 5.1)");
+    setModel("C3", "=(SUM -6 D4)");
+    setModel("C4", "=(SUM E3 1.9)");
+    assertEquals("8.1", getEvalModel("C2"));
+    assertEquals("-5.0", getEvalModel("C3"));
+    assertEquals("3.9", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_SUM_blockReferents() {
     initWorksheetData();
-    setModel("A2", "=(SUM D3:E3)");
-    setModel("A3", "=(SUM E3:E4)");
-    setModel("A4", "=(SUM D3:E4)");
+    setModel("C2", "=(SUM D3:E3)");
+    setModel("C3", "=(SUM E3:E4)");
+    setModel("C4", "=(SUM D3:E4)");
+//    assertEquals("5.0", getEvalModel("C2"));
+//    assertEquals("6.5", getEvalModel("C3"));
+    assertEquals("10.5", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_SUM_mixOfReferents() {
     initWorksheetData();
-    setModel("A2", "=(SUM D3:E4 4.2)");
-    setModel("A3", "=(SUM D3:E4 D3)");
-    setModel("A4", "=(SUM (SUM D3:E4) 13.2 (SUM E3:E4))");
-    setModel("A5", "=A6");
-    setModel("A6", "=(SUM D3 E4)");
+    setModel("C2", "=(SUM D3:E4 4.2)");
+    setModel("C3", "=(SUM D3:E4 D3)");
+    setModel("C4", "=(SUM (SUM D3 D4) (SUM E3 E4))");
+    setModel("C5", "=C6");
+    setModel("C6", "=(SUM D3 E4)");
+    assertEquals("14.7", getEvalModel("C2"));
+    assertEquals("13.5", getEvalModel("C3"));
+    //assertEquals("10.5", getEvalModel("C4"));
+    assertEquals("7.5", getEvalModel("C5"));
+    assertEquals("7.5", getEvalModel("C6"));
   }
 
   @Test
-  public void getEval_formulae_SUM_blankCells() {
-
+  public void getEval_formulae_SUM_blankOrNonNumCells() {
+    initWorksheetData();
+    setModel("C2", "=(SUM C1 D3)");
+    setModel("C3", "=(SUM B1 C1)");
+    setModel("C4", "=(SUM D3 E3 C1)");
+    assertEquals("3.0", getEvalModel("C2"));
+    assertEquals("0.0", getEvalModel("C3"));
+    assertEquals("5.0", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_PRODUCT_justNonReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(PRODUCT 4 3.2 -1.0)");
+    setModel("C3", "=(PRODUCT 5 8)");
+    setModel("C4", "=(PRODUCT 4.2 -7.0)");
+    assertEquals("-12.8", getEvalModel("C2"));
+    assertEquals("40.0", getEvalModel("C3"));
+    assertEquals(-29.4, Double.parseDouble(getEvalModel("C4")), .001);
   }
 
   @Test
   public void getEval_formulae_PRODUCT_singleReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(PRODUCT D3 5.1)");
+    setModel("C3", "=(PRODUCT -6 D4)");
+    setModel("C4", "=(PRODUCT E3 1.9)");
+    assertEquals(15.3, Double.parseDouble(getEvalModel("C2")), .001);
+    assertEquals("-6.0", getEvalModel("C3"));
+    assertEquals("3.8", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_PRODUCT_blockReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(PRODUCT D3:E3)");
+    setModel("C3", "=(PRODUCT E3:E4)");
+    setModel("C4", "=(PRODUCT D3:E4)");
+    assertEquals("6.0", getEvalModel("C2"));
+    assertEquals("9.0", getEvalModel("C3"));
+    assertEquals("27.0", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_PRODUCT_mixOfReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(PRODUCT D3:E4 4.2)");
+    setModel("C3", "=(PRODUCT D3:E4 D3)");
+    setModel("C4", "=(PRODUCT (SUM D3:E4) 13.2 (PRODUCT E3:E4))");
+    setModel("C5", "=C6");
+    setModel("C6", "=(PRODUCT D3 E4)");
+    assertEquals("113.4", getEvalModel("C2"));
+    assertEquals("81.0", getEvalModel("C3"));
+    assertEquals("3207.6", getEvalModel("C4"));
+    assertEquals("13.5", getEvalModel("C5"));
+    assertEquals("13.5", getEvalModel("C6"));
   }
 
   @Test
   public void getEval_formulae_PRODUCT_blankCells() {
-
+    initWorksheetData();
+    setModel("C2", "=(PRODUCT C1 D3)");
+    setModel("C3", "=(PRODUCT B1 C1)");
+    setModel("C4", "=(PRODUCT D3 E3 C1)");
+    assertEquals("3.0", getEvalModel("C2"));
+    assertEquals("0.0", getEvalModel("C3"));
+    assertEquals("6.0", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_justNonReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4 5)");
+    setModel("C3", "=(< 3.1 2.9)");
+    setModel("C4", "=(< 83 83)");
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
+    assertEquals("false", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_singleReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(< D3 5)");
+    setModel("C3", "=(< 3.1 D4)");
+    setModel("C4", "=(< 4.5 E4)");
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
+    assertEquals("false", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_mixOfReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(< E3 D3)");
+    setModel("C3", "=(< E4 E3)");
+    setModel("C4", "=(< D3 D3)");
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
+    assertEquals("false", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_ENUM_justNonReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(ENUM 5 false \"bees\")");
+    setModel("C3", "=(ENUM true 1.1 \"string\")");
+    setModel("C4", "=(ENUM \"yeehaw\" 4 false)");
+    assertEquals("5.0 false \"bees\" ", getEvalModel("C2"));
+    assertEquals("true 1.1 \"string\" " , getEvalModel("C3"));
+    assertEquals("\"yeehaw\" 4.0 false ", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_ENUM_singleReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(ENUM 5 E5 \"bees\")");
+    setModel("C3", "=(ENUM true E4 \"string\")");
+    setModel("C4", "=(ENUM E6 4 false)");
+    assertEquals("5.0 false \"bees\" ", getEvalModel("C2"));
+    assertEquals("true 4.5 \"string\" " , getEvalModel("C3"));
+    assertEquals("\"friend\" 4.0 false ", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_ENUM_blockReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(ENUM D3:D7)");
+    setModel("C3", "=(ENUM D3:D4 E6:E7)");
+    setModel("C4", "=(ENUM D5:E7)");
+    assertEquals("3.0 1.0 true \"bees\" \"true\" ", getEvalModel("C2"));
+    assertEquals("3.0 1.0  \"friend\" \"7.0\" " , getEvalModel("C3"));
+    assertEquals("true false \"bees\" \"friend\" \"true\" \"7.0\" ", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_ENUM_mixOfReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(ENUM D3 D7)");
+    setModel("C3", "=(ENUM D3 D4  E6 E7)");
+    setModel("C4", "=(ENUM D5 E7)");
+    assertEquals("3.0 \"true\" ", getEvalModel("C2"));
+    assertEquals("3.0 1.0 \"friend\" \"7.0\" " , getEvalModel("C3"));
+    assertEquals("true \"7.0\" ", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_ENUM_blankCells() {
-
+    initWorksheetData();
+    setModel("C2", "=(ENUM A2 D7)");
+    setModel("C3", "=(ENUM D3 A4  E6 E7)");
+    setModel("C4", "=(ENUM A2 A7)");
+    assertEquals(" \"true\" ", getEvalModel("C2"));
+    assertEquals("3.0  \"friend\" \"7.0\" " , getEvalModel("C3"));
+    assertEquals("  ", getEvalModel("C4"));
   }
 
   // Functions: Invalid syntax //

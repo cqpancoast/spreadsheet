@@ -71,7 +71,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   @Override
   public String visitSymbol(String s) {
     if (isBlockReference(s)) {
-      return this.visitBlockReference(s); //HELP BLERNER is this correct syntax for visitor pattern?
+      String var = this.visitBlockReference(s);
+      System.out.println(var);
+      return var;
     } else if (isReference(s)) {
       return this.visitReference(s);
     } else if (isError(s)) {
@@ -140,10 +142,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
     /**
      * Increments this accumulator's accumulative value by some function of evalArg.
-     * @param accumulator the variable that is accumulating
      * @param evalArg an evaluated argument
      */
-    protected abstract void accumulate(T accumulator, String evalArg);
+    protected abstract T accumulate(String evalArg);
 
     @Override
     public String visitSList(List<Sexp> args) {
@@ -157,7 +158,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
           return errorArgIsError;
         }
         try {
-          this.accumulate(accumulator, evalArg); //FIXME
+          accumulator = this.accumulate(evalArg);
         } catch (NumberFormatException e) {
           // Do nothing if arg not parsable as what it should be.
         }
@@ -175,7 +176,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
           return errorRefIsError;
         }
         try {
-          this.accumulate(blockAccumulator, refEval);
+          blockAccumulator = this.accumulate(refEval);
         } catch (NumberFormatException e) {
           // Do nothing if arg not parsable as what it should be.
         }
@@ -190,8 +191,11 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private static final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<Double> {
 
+    Double acc;
+
     public SexpEvaluatorSum(FormulaWorksheetModel model) {
       super(model);
+      this.acc = 0.0;
     }
 
     @Override
@@ -200,8 +204,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected void accumulate(Double accumulator, String evalArg) {
-      accumulator += Double.parseDouble(evalArg);
+    protected Double accumulate(String evalArg) {
+      this.acc += Double.parseDouble(evalArg);
+      return acc;
     }
 
     @Override
@@ -227,8 +232,11 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private static final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<Double> {
 
+    Double acc;
+
     public SexpEvaluatorProduct(FormulaWorksheetModel model) {
       super(model);
+      this.acc = 1.0;
     }
 
     @Override
@@ -237,8 +245,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected void accumulate(Double accumulator, String evalArg) {
-      accumulator *= Double.parseDouble(evalArg);
+    protected Double accumulate(String evalArg) {
+      this.acc *= Double.parseDouble(evalArg);
+      return acc;
     }
 
     @Override
@@ -286,17 +295,13 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       } try {
         return String.valueOf(Double.parseDouble(arg1Eval) < Double.parseDouble(arg2Eval));
       } catch (NumberFormatException e) {
+
         return errorArgType;
       }
     }
 
     @Override
     public String visitString(String s) {
-      return errorArgType;
-    }
-
-    @Override
-    public String visitNumber(double d) {
       return errorArgType;
     }
 
@@ -311,8 +316,11 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private static final class SexpEvaluatorEnum extends SexpEvaluatorAccumulator<StringBuilder> {
 
+    StringBuilder acc;
+
     public SexpEvaluatorEnum(FormulaWorksheetModel model) {
       super(model);
+      this.acc = new StringBuilder();
     }
 
     @Override
@@ -321,8 +329,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected void accumulate(StringBuilder accumulator, String evalArg) {
-      accumulator.append(evalArg).append(" ");
+    protected StringBuilder accumulate(String evalArg) {
+      this.acc.append(evalArg).append(" ");
+      return acc;
     }
 
     @Override
