@@ -1,10 +1,9 @@
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 
+import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
-import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import java.util.HashMap;
 import java.util.List;
@@ -816,36 +815,5 @@ public class FormulaWorksheetModelTest {
     model.set(6, 3, null);
     assertEquals(0, model.getMaxColumns());
   }
-//
-//  /** Tests for {@link FormulaWorksheetModel#isValid()}. */ //TODO hold off writing these til we
-//                                                            // figure out whether we need isValid
-//  @Test
-//  public void isValid_emptySheet() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_genericCall() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_cyclicReferences() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidValueSymbol() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidFunctionArgs() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidFunctionSyntax() {
-//
-//  }
+
 }
