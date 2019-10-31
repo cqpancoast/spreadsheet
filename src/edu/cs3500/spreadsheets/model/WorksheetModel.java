@@ -1,6 +1,6 @@
 package edu.cs3500.spreadsheets.model;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a worksheet in a spreadsheet application, in which there is a potentially infinite
@@ -10,7 +10,7 @@ import java.util.List;
  * Grid positions are represented by the prescription in the class {@link Coord}.
  * @param <T> type of raw cell contents
  */
-public interface WorksheetModel<T> { //HELP BLERNER what the heck are invariants? Also is our design good?
+public interface WorksheetModel<T> {
 
   /**
    * Sets the cell at coordinate c in the grid to have the value val.
@@ -49,10 +49,9 @@ public interface WorksheetModel<T> { //HELP BLERNER what the heck are invariants
   int getMaxColumns();
 
   /**
-   * Returns a list of the names of active cells in this worksheet. An example output would be a
-   * list with elements "A2", "D44", "WEED420".
-   * @return a list of names of active cells in this worksheet.
+   * Returns a list of {@link Coord}s for positions of active cells.
+   * @return a list of coordinates of active cells in this worksheet.
    */
-  List<String> getActiveCells();
+  Set<Coord> getActiveCells();
 
 }
