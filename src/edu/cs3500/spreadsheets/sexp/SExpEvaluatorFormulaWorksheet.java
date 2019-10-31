@@ -14,7 +14,7 @@ import java.util.List;
  * string representation of an {@link SSymbol} has the form !#ERROR_[ERRORDESCRIPTION].
  */
 public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
-  private final FormulaWorksheetModel model;
+  protected final FormulaWorksheetModel model;
 
   /**
    * Constructs a {@link SExpEvaluatorFormulaWorksheet}.
@@ -104,7 +104,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       return errorCyclicRef;
     }
     List<Integer> refCoord = Coord.fromString(ref);
-    return this.model.getEval(refCoord.get(0), refCoord.get(1));
+    return this.evaluate(this.model.getRaw(refCoord.get(0), refCoord.get(1)));
   }
 
   /**
@@ -115,6 +115,15 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   protected boolean hasCycles(String refString) {
     return new SexpCheckCycles(this.model).visitSymbol(refString);
+  }
+
+  /**
+   * Returns new instance of this class with the same model field. The purpose of this is to ensure
+   * that
+   * @return new instance of this
+   */
+  protected SExpEvaluatorFormulaWorksheet newInstanceOfThis() {
+    return new SExpEvaluatorFormulaWorksheet(this.model);
   }
 
 
@@ -151,7 +160,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     public String visitSList(List<Sexp> args) {
       T accumulator = this.initializeValue();
       for (Sexp arg : args) {
-        String evalArg = this.evaluate(arg);
+        //If the sexp is a list, it should be evaluated by a new evaluator from the start
+        //TODO make more beautiful later
+        String evalArg;
+        if (arg.toString().indexOf("(") == 0) {
+          evalArg = new SExpEvaluatorFormulaWorksheet(super.model).evaluate(arg);
+        } else {
+          evalArg = this.evaluate(arg); //Otherwise, evaluate it in here
+        }
         if (isError(evalArg)) {
           if (evalArg.equals(errorArgType)) {
             return evalArg;
@@ -172,7 +188,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       T blockAccumulator = this.initializeValue();
       BlockReferenceIterator blockRefs = new BlockReferenceIterator(blockRef);
       while (blockRefs.hasNext()) {
-        String refEval = this.visitReference(blockRefs.next());
+        String refEval = this.evaluate(blockRefs.next());
         if (isError(refEval)) {
           return refEval;
         }
@@ -294,8 +310,21 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       if (args.size() != 2) {
         return errorInvalidArity;
       }
-      String arg1Eval = super.evaluate(args.get(0));
-      String arg2Eval = super.evaluate(args.get(1));
+      Sexp arg1 = args.get(0);
+      Sexp arg2 = args.get(1);
+      String arg1Eval;
+      String arg2Eval;
+      //If the sexp is a list, it should be evaluated by a new evaluator from the start
+      if (arg1.toString().indexOf("(") == 0) {
+        arg1Eval = new SExpEvaluatorFormulaWorksheet(super.model).evaluate(arg1);
+      } else {
+        arg1Eval = this.evaluate(arg1); //Otherwise, evaluate it in here
+      }
+      if (arg2.toString().indexOf("(") == 0) {
+        arg2Eval = new SExpEvaluatorFormulaWorksheet(super.model).evaluate(arg2);
+      } else {
+        arg2Eval = this.evaluate(arg2); //Otherwise, evaluate it in here
+      }
       if (arg1Eval.equals(super.blankCellEvaluant())
           || arg2Eval.equals(super.blankCellEvaluant())) {
         return errorInvalidBlankCellRef;

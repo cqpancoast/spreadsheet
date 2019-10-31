@@ -22,9 +22,6 @@ public class BeyondGood {
    */
   public static void main(String[] args) {
 
-    //HELP ensure args non-null?
-    //HELP BLERNER should we create a class outside of main so that stuff is testable or is this small enough where it doesn't matter?
-
     if (!wellFormedCommand(args)) {
       System.out.println("Malformed command arguments. You're better than this.");
       return;
@@ -81,7 +78,7 @@ public class BeyondGood {
     while(true) {
       try {
         fileLine = reader.readLine();
-        if (fileLine == null) //FIXME This probably doesn't work or something
+        if (fileLine == null) //FIXME Use the worksheetreader
           break;
       } catch (IOException e) {
         //Do nothing; file is done being read from.
@@ -116,16 +113,14 @@ public class BeyondGood {
    * Evaluates a cell in the worksheet and prints the result if there are no errors within the
    * worksheet. If there are errors in a worksheet, don't evaluate the cell, but rather print
    * messages of the form "Error in cell Z42: ..." for every errored cell in the model.
-   * @param model a {@link WorksheetModel} //HELP: or FWM? Covered by HELP below
+   * @param model a {@link WorksheetModel}
    * @param evalCellName a string representation of the cell to evaluate's position in the
    *                     worksheet grid
    */
   private static void evaluateCellInWorksheet(WorksheetModel<String> model, String evalCellName) {
     List<Integer> colAndRow = Coord.fromString(evalCellName);
     boolean errorInWorksheet = false;
-    //HELP BLERNER should main use interface or implementation of model ? if imp. then I can iterate
-    // more efficiently over cells, but with the interface I'd have to iterate over the rectangular
-    // region defined by the max row and max column.
+    //HELP USE as interface. Perhaps expand interface for ease of use. Hmmm.
 //    for (Coord cellCoord : worksheet /*Iterate over worksheet as per above decision*/) {
 //      String cellEval = model.getEval(col, row);
 //      if (cellEval.split(" ")[0].equals("!#ERROR")) {
