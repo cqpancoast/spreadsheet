@@ -23,6 +23,7 @@ public class BeyondGood {
   public static void main(String[] args) {
 
     //HELP ensure args non-null?
+    //HELP BLERNER should we create a class outside of main so that stuff is testable or is this small enough where it doesn't matter?
 
     if (!wellFormedCommand(args)) {
       System.out.println("Malformed command arguments. You're better than this.");
@@ -57,7 +58,7 @@ public class BeyondGood {
     return args.length == 4
         && args[0].equals("-in")
         && args[2].equals("-eval")
-        && Coord.validReferenceName(args[3]);
+        && Coord.validCellName(args[3]);
   }
 
   /**
@@ -76,10 +77,11 @@ public class BeyondGood {
       throw new IllegalArgumentException("File not found.");
     }
     WorksheetBuilder<FormulaWorksheetModel> modelBuilder = new FormulaWorksheetBuilder();
-    String fileLine = "";
+    String fileLine = null;
     while(true) {
       try {
-        if ((fileLine = reader.readLine()) == null) //TODO rewrite code into something I understand
+        fileLine = reader.readLine();
+        if (fileLine == null) //FIXME This probably doesn't work or something
           break;
       } catch (IOException e) {
         //Do nothing; file is done being read from.
@@ -114,7 +116,7 @@ public class BeyondGood {
    * Evaluates a cell in the worksheet and prints the result if there are no errors within the
    * worksheet. If there are errors in a worksheet, don't evaluate the cell, but rather print
    * messages of the form "Error in cell Z42: ..." for every errored cell in the model.
-   * @param model a {@link WorksheetModel} //HELP: or FWM?
+   * @param model a {@link WorksheetModel} //HELP: or FWM? Covered by HELP below
    * @param evalCellName a string representation of the cell to evaluate's position in the
    *                     worksheet grid
    */
@@ -124,16 +126,16 @@ public class BeyondGood {
     //HELP BLERNER should main use interface or implementation of model ? if imp. then I can iterate
     // more efficiently over cells, but with the interface I'd have to iterate over the rectangular
     // region defined by the max row and max column.
-    for (Coord cellCoord : worksheet /*Iterate over worksheet as per above decision*/) {
-      String cellEval = model.getEval(col, row);
-      if (cellEval.split(" ")[0].equals("!#ERROR")) {
-        errorInWorksheet = true;
-        System.out.println("Error in cell " + cellName + ": " + cellEval);
-      }
-    }
-    if (!errorInWorksheet) {
-      System.out.println(model.getEval(col, row));
-    }
+//    for (Coord cellCoord : worksheet /*Iterate over worksheet as per above decision*/) {
+//      String cellEval = model.getEval(col, row);
+//      if (cellEval.split(" ")[0].equals("!#ERROR")) {
+//        errorInWorksheet = true;
+//        System.out.println("Error in cell " + cellName + ": " + cellEval);
+//      }
+//    }
+//    if (!errorInWorksheet) {
+//      System.out.println(model.getEval(col, row));
+//    }
   }
 
 }

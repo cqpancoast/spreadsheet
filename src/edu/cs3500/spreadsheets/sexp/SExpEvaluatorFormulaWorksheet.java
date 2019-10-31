@@ -17,8 +17,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   private final FormulaWorksheetModel model;
 
   /**
-   * //TODO
-   * @param model
+   * Constructs a {@link SExpEvaluatorFormulaWorksheet}.
+   * @param model the model that this evaluates {@link Sexp}s from.
    */
   public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
     if (model == null) {
@@ -71,13 +71,9 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   @Override
   public String visitSymbol(String s) {
     if (isBlockReference(s)) {
-      String var = this.visitBlockReference(s); //NOTE println here
-      System.out.println(var);
-      return var;
+      return this.visitBlockReference(s);
     } else if (isReference(s)) {
       return this.visitReference(s);
-    } else if (isError(s)) {
-      return errorRefIsError;
     } else {
       return errorInvalidSymbol;
     }
@@ -104,7 +100,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * @return the evaluation of ref
    */
   protected String visitReference(String ref) {
-    if (this.hasCycles(ref)) { //NOTE error
+    if (this.hasCycles(ref)) {
       return errorCyclicRef;
     }
     List<Integer> refCoord = Coord.fromString(ref);
@@ -130,7 +126,11 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private abstract static class SexpEvaluatorAccumulator<T> extends SExpEvaluatorFormulaWorksheet {
 
-    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) { //HELP BLERNER model == null?
+    /**
+     * Creates a {@link SexpEvaluatorAccumulator}.
+     * @param model the model that this evaluates cell values from
+     */
+    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) {
       super(model);
     }
 
@@ -142,15 +142,16 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
     /**
      * Increments this accumulator's accumulative value by some function of evalArg.
+     * @param accumulator the value to be accumulated
      * @param evalArg an evaluated argument
      */
-    protected abstract T accumulate(String evalArg);
+    protected abstract void accumulate(T accumulator, String evalArg);
 
     @Override
     public String visitSList(List<Sexp> args) {
       T accumulator = this.initializeValue();
       for (Sexp arg : args) {
-        String evalArg = super.evaluate(arg);
+        String evalArg = this.evaluate(arg);
         if (isError(evalArg)) {
           if (evalArg.equals(errorArgType)) {
             return evalArg;
@@ -158,12 +159,12 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
           return errorArgIsError;
         }
         try {
-          accumulator = this.accumulate(evalArg);
+          this.accumulate(accumulator, evalArg);
         } catch (NumberFormatException e) {
           // Do nothing if arg not parsable as what it should be.
         }
       }
-      return accumulator.toString();
+      return accumulator.toString().stripTrailing();
     }
 
     @Override
@@ -173,10 +174,10 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       while (blockRefs.hasNext()) {
         String refEval = this.visitReference(blockRefs.next());
         if (isError(refEval)) {
-          return errorRefIsError;
+          return refEval;
         }
         try {
-          blockAccumulator = this.accumulate(refEval);
+          this.accumulate(blockAccumulator, refEval);
         } catch (NumberFormatException e) {
           // Do nothing if arg not parsable as what it should be.
         }
@@ -189,13 +190,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Sums all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private static final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<Double> {
+  private final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<Double> {
 
-    Double acc;
-
+    /**
+     * Constructs a {@link SexpEvaluatorSum}.
+     * @param model the model that this evaluates {@link Sexp}s from.
+     */
     public SexpEvaluatorSum(FormulaWorksheetModel model) {
       super(model);
-      this.acc = 0.0;
     }
 
     @Override
@@ -204,19 +206,18 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected Double accumulate(String evalArg) {
-      this.acc += Double.parseDouble(evalArg);
-      return acc;
+    protected void accumulate(Double accumulator, String evalArg) {
+      accumulator += Double.parseDouble(evalArg);
     }
 
     @Override
     public String visitBoolean(boolean b) {
-      return errorArgType;
+      return "0";
     }
 
     @Override
     public String visitString(String s) {
-      return errorArgType;
+      return "0";
     }
 
     @Override
@@ -230,13 +231,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Multiplies all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private static final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<Double> {
+  private final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<Double> {
 
-    Double acc;
-
+    /**
+     * Constructs a {@link SexpEvaluatorProduct}.
+     * @param model the model that this evaluates {@link Sexp}s from.
+     */
     public SexpEvaluatorProduct(FormulaWorksheetModel model) {
       super(model);
-      this.acc = 1.0;
     }
 
     @Override
@@ -245,24 +247,27 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected Double accumulate(String evalArg) {
-      this.acc *= Double.parseDouble(evalArg);
-      return acc;
+    protected void accumulate(Double accumulator, String evalArg) {
+      if (accumulator == 0.0) {
+        accumulator = Double.parseDouble(evalArg);
+      } else {
+        accumulator *= Double.parseDouble(evalArg);
+      }
     }
 
     @Override
     public String visitBoolean(boolean b) {
-      return errorArgType;
+      return "1";
     }
 
     @Override
     public String visitString(String s) {
-      return errorArgType;
+      return "1";
     }
 
     @Override
     protected final String blankCellEvaluant() {
-      return "0";
+      return "1";
     }
   }
 
@@ -276,6 +281,10 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private static final class SexpEvaluatorLessThan extends SExpEvaluatorFormulaWorksheet {
 
+    /**
+     * Constructs a {@link SexpEvaluatorLessThan}.
+     * @param model the model that this evaluates {@link Sexp}s from.
+     */
     public SexpEvaluatorLessThan(FormulaWorksheetModel model) {
       super(model);
     }
@@ -287,7 +296,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       }
       String arg1Eval = super.evaluate(args.get(0));
       String arg2Eval = super.evaluate(args.get(1));
-      if (isBlankCell(arg1Eval) || isBlankCell(arg2Eval)) {
+      if (arg1Eval.equals(super.blankCellEvaluant())
+          || arg2Eval.equals(super.blankCellEvaluant())) {
         return errorInvalidBlankCellRef;
       }
       if (isError(arg1Eval) || isError(arg2Eval)) {
@@ -316,11 +326,12 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private static final class SexpEvaluatorEnum extends SexpEvaluatorAccumulator<StringBuilder> {
 
-    StringBuilder acc;
-
+    /**
+     * Constructs a {@link SexpEvaluatorEnum}.
+     * @param model the model that this evaluates {@link Sexp}s from.
+     */
     public SexpEvaluatorEnum(FormulaWorksheetModel model) {
       super(model);
-      this.acc = new StringBuilder();
     }
 
     @Override
@@ -329,9 +340,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected StringBuilder accumulate(String evalArg) {
-      this.acc.append(evalArg).append(" ");
-      return acc;
+    protected void accumulate(StringBuilder accumulator, String evalArg) {
+      accumulator.append(evalArg).append(" ");
     }
 
     @Override
@@ -346,14 +356,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   private final static class BlockReferenceIterator implements Iterator<String> {
 
-    private final int startCol, startRow, endCol, endRow; //HELP BLERNER it's small, but should I follow IntelliJ's advice here?
+    private final int startCol, startRow, endCol, endRow;
     private int col, row;
 
     /**
      * Creates a new {@link BlockReferenceIterator}.
      * @param blockRef a string representing a reference to a block of cells
      */
-    private BlockReferenceIterator(String blockRef) { //HELP BLERNER What does private mean here?
+    private BlockReferenceIterator(String blockRef) {
       if (!isBlockReference(blockRef)) {
         throw new IllegalArgumentException("Received invalid block reference string.");
       }

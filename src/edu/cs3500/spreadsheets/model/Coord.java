@@ -54,19 +54,16 @@ public class Coord {
    * Converts the given reference string into a two-element list with the structure {col, row}.
    * @param refString the string representation of a {@link Coord}
    * @return a list {col, row} corresponding to the given reference string
+   * @throws IllegalArgumentException if refString is malformed
    */
-  public static List<Integer> fromString(String refString) {
-    if (!validReferenceName(refString)) {
+  public static List<Integer> fromString(String refString) throws IllegalArgumentException {
+    if (!validCellName(refString)) {
       throw new IllegalArgumentException("Invalid reference string.");
     }
     String rowString = refString.replaceAll("[^0-9]", "");
     String colString = refString.replaceAll("[^A-Z]", "");
-    try {
-      return new ArrayList<Integer>(
+    return new ArrayList<Integer>(
           Arrays.asList(Coord.colNameToIndex(colString), Integer.parseInt(rowString)));
-    } catch (Exception e) {
-      throw new IllegalArgumentException("The given string was not a well formed reference string.");
-    }
   }
 
   @Override
@@ -79,8 +76,8 @@ public class Coord {
    * @param s string representation of a symbol
    * @return whether s is a valid reference
    */
-  public static boolean validReferenceName(String s) { //TODO
-    return true;
+  public static boolean validCellName(String s) {
+    return s.matches("[A-Z]+[0-9]+");
   }
 
   @Override

@@ -7,7 +7,7 @@ package edu.cs3500.spreadsheets.model;
  * different from its raw contents. For ease of display, the evaluated contents are always Strings.
  * @param <T> type of raw cell contents
  */
-public interface WorksheetModel<T> { //HELP BLERNER how do you feel about our design?
+public interface WorksheetModel<T> {
 
   /**
    * Sets the cell at coordinate c in the grid to have the value val.

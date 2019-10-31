@@ -9,11 +9,10 @@ import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
  */
 public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
 
-  protected static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF"; //HELP BLERNER copy-paste?
+  protected static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
   protected static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   protected static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   protected static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
-  protected static final String errorRefIsError = "!#ERROR_REFISERROR";
   protected static final String errorCyclicRef = "!#ERROR_CYCLICREF";
   protected static final String errorArgIsError = "!#ERROR_ARGISERROR";
   protected static final String errorArgType = "!#ERROR_ARGTYPE";
@@ -26,7 +25,6 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @return evaluated s
    */
   public T evaluate(Sexp sexp) {
-    //System.out.println(sexp); NOTE println here
     return sexp.accept(this);
   }
 
@@ -68,13 +66,21 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
   protected abstract T blankCellEvaluant();
 
   /**
+   * Returns what the value of a cell should be that has an error, according to the rules of
+   * this evaluation.
+   * @param errorSymbol the error symbol of the cell
+   * @return the cell value
+   */
+  protected abstract T errorEvaluant(String errorSymbol);
+
+  /**
    * Ensures that the raw value has the correct syntax with respect to equals signs and formulae.
    * Returns syntax error symbol if raw begins with an open paren, removes equals sign if raw begins
    * with one. THIS DOES NOT ENSURE THAT RAW IS PARSABLE, OR HAS THE CORRECT SYNTAX IN GENERAL.
    * @param raw raw contents of a cell
    * @return processed string value or error symbol
    */
-  protected static String processRawValue(String raw) { //TODO require that references begin with equals signs
+  protected static String processRawValue(String raw) {
     if (raw.indexOf("=") == 0) {
       return raw.substring(1);
     } else if (raw.indexOf("(") == 0) {
@@ -83,14 +89,6 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
       return raw;
     }
   }
-
-  /**
-   * Returns what the value of a cell should be that has an error, according to the rules of
-   * this evaluation.
-   * @param errorSymbol the error symbol of the cell
-   * @return the cell value
-   */
-  protected abstract T errorEvaluant(String errorSymbol);
 
   /**
    * Determines whether s is a block reference.
@@ -116,7 +114,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @return whether s is a reference
    */
   protected static boolean isReference(String s) {
-    return Coord.validReferenceName(s);
+    return Coord.validCellName(s);
   }
 
   /**

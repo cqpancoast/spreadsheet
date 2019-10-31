@@ -19,7 +19,6 @@ public class FormulaWorksheetModelTest {
   private static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   private static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   private static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
-  private static final String errorRefIsError = "!#ERROR_REFISERROR";
   private static final String errorCyclicRef = "!#ERROR_CYCLICREF";
   private static final String errorArgIsError = "!#ERROR_ARGISERROR";
   private static final String errorArgType = "!#ERROR_ARGTYPE";
@@ -32,7 +31,7 @@ public class FormulaWorksheetModelTest {
    * index; that is, (except for specific tests to make sure that references work in the opposite
    * direction) references will always be a smaller column index referencing a larger column index.
    * This presents a nice way of dealing with functional composition: functions in column A compose
-   * functions and data in column B, etc. //TODO provide link to image on imgur or something?
+   * functions and data in column B, etc.
    */
   private void initWorksheetData() {
     this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
@@ -52,7 +51,7 @@ public class FormulaWorksheetModelTest {
    * @param cellString the string corresponding to the cell to be set
    * @param val the value to be set
    */
-  private void setModel(String cellString, String val) { //NOTE return value to be set?
+  private void setModel(String cellString, String val) {
     List<Integer> fromString = Coord.fromString(cellString);
     this.model.set(fromString.get(0), fromString.get(1), val);
   }
@@ -286,7 +285,7 @@ public class FormulaWorksheetModelTest {
   public void getEval_formulae_randomSymbol() {
     initWorksheetData();
     setModel("C2", "RANDOM");
-    assertEquals(errorSyntax, getEvalModel("C2"));
+    assertEquals(errorInvalidSymbol, getEvalModel("C2"));
   }
 
   //* FORMULAE: Just references *//
@@ -573,6 +572,13 @@ public class FormulaWorksheetModelTest {
     assertEquals(errorInvalidCommand, getEvalModel("C2"));
   }
 
+  @Test
+  public void getEval_formulae_LESSTHAN_invalidBlankCellReference() {
+    initWorksheetData();
+    setModel("C2", "=(< D44 D5)");
+    assertEquals(errorInvalidBlankCellRef, getEvalModel("C2"));
+  }
+
   // Functions: Invalid arguments //
   @Test
   public void getEval_formulae_SUM_errorProp() {
@@ -632,8 +638,8 @@ public class FormulaWorksheetModelTest {
     initWorksheetData();
     setModel("C2", "=(< D2 E2)");
     setModel("C3", "=(< E2 5)");
-    assertEquals(errorArgType, getEvalModel("C2"));
-    assertEquals(errorArgType, getEvalModel("C3"));
+    assertEquals(errorInvalidBlankCellRef, getEvalModel("C2"));
+    assertEquals(errorInvalidBlankCellRef, getEvalModel("C3"));
   }
 
   @Test
