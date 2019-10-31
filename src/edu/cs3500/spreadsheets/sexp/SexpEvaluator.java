@@ -9,22 +9,22 @@ import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
  */
 public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
 
-  protected static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
-  protected static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
-  protected static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
-  protected static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
-  protected static final String errorCyclicRef = "!#ERROR_CYCLICREF";
-  protected static final String errorArgIsError = "!#ERROR_ARGISERROR";
-  protected static final String errorArgType = "!#ERROR_ARGTYPE";
-  protected static final String errorInvalidArity = "!#ERROR_ARITY";
-  protected static final String errorSyntax = "!#ERROR_SYNTAX";
+  static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
+  static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
+  static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
+  static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
+  static final String errorCyclicRef = "!#ERROR_CYCLICREF";
+  static final String errorArgIsError = "!#ERROR_ARGISERROR";
+  static final String errorArgType = "!#ERROR_ARGTYPE";
+  static final String errorInvalidArity = "!#ERROR_ARITY";
+  static final String errorSyntax = "!#ERROR_SYNTAX";
 
   /**
    * Evaluates sexp according to the purpose of this evaluator.
    * @param sexp a sexp
    * @return evaluated s
    */
-  public T evaluate(Sexp sexp) {
+  T evaluate(Sexp sexp) {
     return sexp.accept(this);
   }
 
@@ -40,13 +40,13 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     }
     String processedRaw = processRawValue(s);
     if (isError(processedRaw)) {
-      return this.errorEvaluant(errorSyntax);
+      return this.errorEvaluant();
     }
     try {
       Sexp parsedSexp = Parser.parse(processedRaw);
       return this.evaluate(parsedSexp);
     } catch (IllegalArgumentException e) {
-      return this.errorEvaluant(errorSyntax);
+      return this.errorEvaluant();
     }
   }
 
@@ -55,7 +55,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param s a string rep of a S-exp
    * @return whether string rep of S-exp is of a blank cell
    */
-  protected static boolean isBlankCell(String s) {
+  private static boolean isBlankCell(String s) {
     return s == null;
   }
 
@@ -68,10 +68,9 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
   /**
    * Returns what the value of a cell should be that has an error, according to the rules of
    * this evaluation.
-   * @param errorSymbol the error symbol of the cell
    * @return the cell value
    */
-  protected abstract T errorEvaluant(String errorSymbol);
+  protected abstract T errorEvaluant();
 
   /**
    * Ensures that the raw value has the correct syntax with respect to equals signs and formulae.
@@ -80,7 +79,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param raw raw contents of a cell
    * @return processed string value or error symbol
    */
-  protected static String processRawValue(String raw) {
+  private static String processRawValue(String raw) {
     if (raw.indexOf("=") == 0) {
       return raw.substring(1);
     } else if (raw.indexOf("(") == 0) {
@@ -95,7 +94,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param s the given string representation of an {@link SSymbol}
    * @return whether s is a block reference
    */
-  protected static boolean isBlockReference(String s) {
+  static boolean isBlockReference(String s) {
     String[] refs = s.split(":");
     if (refs.length != 2) {
       return false;
@@ -113,7 +112,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param s the given string representation of an {@link SSymbol}
    * @return whether s is a reference
    */
-  protected static boolean isReference(String s) {
+  static boolean isReference(String s) {
     return Coord.validCellName(s);
   }
 
@@ -122,7 +121,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param evalArg an evaluated S-exp
    * @return whether string rep of s-exp is an error
    */
-  protected static boolean isError(String evalArg) {
+  static boolean isError(String evalArg) {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
   }

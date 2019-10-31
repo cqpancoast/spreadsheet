@@ -32,7 +32,7 @@ public class SexpCheckCycles extends SexpEvaluator<Boolean> {
   }
 
   @Override
-  protected Boolean errorEvaluant(String errorSymbol) {
+  protected Boolean errorEvaluant() {
     return false;
   }
 

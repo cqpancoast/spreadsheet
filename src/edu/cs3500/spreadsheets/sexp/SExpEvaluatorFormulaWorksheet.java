@@ -33,8 +33,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   }
 
   @Override
-  protected String errorEvaluant(String errorSymbol) {
-    return errorSymbol;
+  protected String errorEvaluant() {
+    return SexpEvaluator.errorSyntax;
   }
 
   @Override
@@ -99,7 +99,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * @param ref a string representation of a {@link SSymbol} reference
    * @return the evaluation of ref
    */
-  protected String visitReference(String ref) {
+  private String visitReference(String ref) {
     if (this.hasCycles(ref)) {
       return errorCyclicRef;
     }
@@ -113,7 +113,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * @param refString a string representation of a cell reference
    * @return whether the cell refers to itself recursively
    */
-  protected boolean hasCycles(String refString) {
+  private boolean hasCycles(String refString) {
     return new SexpCheckCycles(this.model).visitSymbol(refString);
   }
 
@@ -139,7 +139,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
      * Creates a {@link SexpEvaluatorAccumulator}.
      * @param model the model that this evaluates cell values from
      */
-    public SexpEvaluatorAccumulator(FormulaWorksheetModel model) {
+    SexpEvaluatorAccumulator(FormulaWorksheetModel model) {
       super(model);
     }
 
@@ -161,7 +161,6 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       T accumulator = this.initializeValue();
       for (Sexp arg : args) {
         //If the sexp is a list, it should be evaluated by a new evaluator from the start
-        //TODO make more beautiful later
         String evalArg;
         if (arg.toString().indexOf("(") == 0) {
           evalArg = new SExpEvaluatorFormulaWorksheet(super.model).evaluate(arg);
@@ -206,24 +205,26 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Sums all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<Double> {
+  private final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<StringBuilder> {
 
     /**
      * Constructs a {@link SexpEvaluatorSum}.
      * @param model the model that this evaluates {@link Sexp}s from.
      */
-    public SexpEvaluatorSum(FormulaWorksheetModel model) {
+    SexpEvaluatorSum(FormulaWorksheetModel model) {
       super(model);
     }
 
     @Override
-    protected Double initializeValue() {
-      return 0.0;
+    protected StringBuilder initializeValue() {
+      return new StringBuilder("0.0");
     }
 
     @Override
-    protected void accumulate(Double accumulator, String evalArg) {
-      accumulator += Double.parseDouble(evalArg);
+    protected void accumulate(StringBuilder accumulator, String evalArg) {
+      Double var = (Double.parseDouble(accumulator.toString()) + Double.parseDouble(evalArg));
+      accumulator.delete(0, accumulator.length());
+      accumulator.append(var);
     }
 
     @Override
@@ -247,43 +248,50 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Multiplies all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<Double> {
+  private final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<StringBuilder> {
 
     /**
      * Constructs a {@link SexpEvaluatorProduct}.
      * @param model the model that this evaluates {@link Sexp}s from.
      */
-    public SexpEvaluatorProduct(FormulaWorksheetModel model) {
+    SexpEvaluatorProduct(FormulaWorksheetModel model) {
       super(model);
     }
 
     @Override
-    protected Double initializeValue() {
-      return 0.0;
+    protected StringBuilder initializeValue() {
+      return new StringBuilder("0.0");
     }
 
     @Override
-    protected void accumulate(Double accumulator, String evalArg) {
-      if (accumulator == 0.0) {
-        accumulator = Double.parseDouble(evalArg);
-      } else {
-        accumulator *= Double.parseDouble(evalArg);
+    protected void accumulate(StringBuilder accumulator, String evalArg) {
+      double var;
+      if (Double.parseDouble(accumulator.toString()) == 0.0 && evalArg.equals("nonNumeric")) {
+        var = 0.0;
       }
+      else if (Double.parseDouble(accumulator.toString()) == 0.0) {
+        var = (1.0 * Double.parseDouble(evalArg));
+      }
+      else {
+        var = (Double.parseDouble(accumulator.toString()) * Double.parseDouble(evalArg));
+      }
+      accumulator.delete(0, accumulator.length());
+      accumulator.append(var);
     }
 
     @Override
     public String visitBoolean(boolean b) {
-      return "1";
+      return "nonNumeric";
     }
 
     @Override
     public String visitString(String s) {
-      return "1";
+      return "nonNumeric";
     }
 
     @Override
     protected final String blankCellEvaluant() {
-      return "1";
+      return "nonNumeric";
     }
   }
 
@@ -301,7 +309,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
      * Constructs a {@link SexpEvaluatorLessThan}.
      * @param model the model that this evaluates {@link Sexp}s from.
      */
-    public SexpEvaluatorLessThan(FormulaWorksheetModel model) {
+    SexpEvaluatorLessThan(FormulaWorksheetModel model) {
       super(model);
     }
 
@@ -359,7 +367,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
      * Constructs a {@link SexpEvaluatorEnum}.
      * @param model the model that this evaluates {@link Sexp}s from.
      */
-    public SexpEvaluatorEnum(FormulaWorksheetModel model) {
+    SexpEvaluatorEnum(FormulaWorksheetModel model) {
       super(model);
     }
 
@@ -431,5 +439,4 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       return nextReference;
     }
   }
-
 }
