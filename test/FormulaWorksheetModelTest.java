@@ -728,37 +728,5 @@ public class FormulaWorksheetModelTest {
     model.set(6, 3, null);
     assertEquals(0, model.getMaxColumns());
   }
-//
-//  /** Tests for {@link FormulaWorksheetModel#isValid()}. */ //TODO hold off writing these til we
-//                                                            // figure out whether we need isValid
-//  @Test
-//  public void isValid_emptySheet() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_genericCall() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_cyclicReferences() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidValueSymbol() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidFunctionArgs() {
-//
-//  }
-//
-//  @Test
-//  public void isValid_invalidFunctionSyntax() {
-//
-//  }
 
 }

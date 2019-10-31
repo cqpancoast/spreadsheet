@@ -71,7 +71,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   @Override
   public String visitSymbol(String s) {
     if (isBlockReference(s)) {
-      String var = this.visitBlockReference(s);
+      String var = this.visitBlockReference(s); //NOTE println here
       System.out.println(var);
       return var;
     } else if (isReference(s)) {

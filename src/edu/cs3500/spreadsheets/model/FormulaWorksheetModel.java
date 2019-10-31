@@ -81,43 +81,6 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
     return max;
   }
 
-//  @Override NOTE
-//  public boolean isValid() {
-//    for (Coord c : worksheet.keySet()) {
-//      String raw = getRaw(c.col, c.row);
-//      try {
-//        if (!raw.contains("=")) {
-//          Parser.parse(raw);
-//        }
-//        if (raw.contains("=")) {
-//          Parser.parse(raw.substring(1));
-//        }
-//      }
-//      catch (IllegalArgumentException e) {
-//        return false;
-//      }
-//
-//    }
-//    return !hasCycles();
-//  }
-//
-//  /**
-//   * Returns whether or not any s-expression in the worksheet contains cycles.
-//   * @return whether the worksheet contains cycles
-//   */
-//  private boolean hasCycles() {
-//    for (Coord c : worksheet.keySet()) {
-//      String raw = getRaw(c.col, c.row);
-//      if (raw.contains("=")) {
-//        Sexp sexp = Parser.parse(raw.substring(1));
-//        if (sexp.accept(new SexpCheckCycles(Parser.parse(c.toString())))) {
-//          return true;
-//        }
-//      }
-//    }
-//    return false;
-//  }
-
   /**
    * A builder pattern for producing {@link FormulaWorksheetModel}s.
    */

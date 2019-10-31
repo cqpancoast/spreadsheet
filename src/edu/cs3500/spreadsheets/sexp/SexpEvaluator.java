@@ -2,7 +2,6 @@ package edu.cs3500.spreadsheets.sexp;
 
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
-import java.util.List;
 
 /**
  * A visitor to evaluate string-represented {@link Sexp} values in a {@link FormulaWorksheetModel}.
@@ -27,7 +26,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @return evaluated s
    */
   public T evaluate(Sexp sexp) {
-    //System.out.println(sexp);
+    //System.out.println(sexp); NOTE println here
     return sexp.accept(this);
   }
 
