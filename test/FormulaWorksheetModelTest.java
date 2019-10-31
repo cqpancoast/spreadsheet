@@ -15,7 +15,6 @@ import org.junit.Test;
 public class FormulaWorksheetModelTest {
 
   private WorksheetModel<String> model;
-  private static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
   private static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   private static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   private static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
@@ -391,7 +390,7 @@ public class FormulaWorksheetModelTest {
     assertEquals("7.5", getEvalModel("C2"));
     assertEquals("10.5", getEvalModel("C3"));
     assertEquals("7.5", getEvalModel("C4"));
-    assertEquals("10.0", getEvalModel("C5"));
+    assertEquals("9.0", getEvalModel("C5"));
   }
 
   @Test
@@ -402,7 +401,7 @@ public class FormulaWorksheetModelTest {
     setModel("C4", "=(SUM D3 E3 C1)");
     setModel("C5", "=(SUM)");
     setModel("C6", "=(SUM true \"street\")");
-    setModel("C6", "=(SUM true 7 \"street\")");
+    setModel("C7", "=(SUM true 7 \"street\")");
     assertEquals("3.0", getEvalModel("C2"));
     assertEquals("0.0", getEvalModel("C3"));
     assertEquals("5.0", getEvalModel("C4"));
@@ -450,10 +449,10 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(PRODUCT D3 E4)");
     setModel("C3", "=(PRODUCT D3 E4 D3)");
     setModel("C4", "=C2");
-    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");  // arg is error
-    //assertEquals("13.5", getEvalModel("C2"));
-    //assertEquals("40.5", getEvalModel("C3"));
-    //assertEquals("13.5", getEvalModel("C4"));
+    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");
+    assertEquals("13.5", getEvalModel("C2"));
+    assertEquals("40.5", getEvalModel("C3"));
+    assertEquals("13.5", getEvalModel("C4"));
     assertEquals("27.0", getEvalModel("C5"));
   }
 
@@ -465,7 +464,7 @@ public class FormulaWorksheetModelTest {
     setModel("C4", "=(PRODUCT D3 E3 C1)");
     setModel("C5", "=(PRODUCT)");
     setModel("C6", "=(PRODUCT true \"street\")");
-    setModel("C6", "=(PRODUCT true 7 \"street\")");
+    setModel("C7", "=(PRODUCT true 7 \"street\")");
     assertEquals("3.0", getEvalModel("C2"));
     assertEquals("0.0", getEvalModel("C3"));
     assertEquals("6.0", getEvalModel("C4"));
@@ -515,13 +514,13 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(ENUM 5 false \"bees\")");
     setModel("C3", "=(ENUM true 1.1 \"string\")");
     setModel("C4", "=(ENUM \"yeehaw\" 4 false)");
-    setModel("C5", "=(ENUM \"\"double\"\" 9.1)");
-    setModel("C5", "=(ENUM \"\\double\\\" 9.1)");
+    setModel("C5", "=(ENUM \"\\\"double\\\"\" 9.1)");
+    setModel("C6", "=(ENUM \"\\\\double\\\\\" 9.1)");
     assertEquals("5.0 false \"bees\"", getEvalModel("C2"));
     assertEquals("true 1.1 \"string\"" , getEvalModel("C3"));
     assertEquals("\"yeehaw\" 4.0 false", getEvalModel("C4"));
-    assertEquals("\"\"double\"\" 9.1", getEvalModel("C5"));  // error syntax
-    assertEquals("\"\\double\\\" 9.1", getEvalModel("C5"));  // error syntax
+    assertEquals("\"\"double\"\" 9.1", getEvalModel("C5"));  // arg is error
+    assertEquals("\"\\double\\\" 9.1", getEvalModel("C6"));  // error syntax
   }
 
   @Test
