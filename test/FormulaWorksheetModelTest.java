@@ -844,6 +844,8 @@ public class FormulaWorksheetModelTest {
     assertEquals(0, model.getMaxColumns());
   }
 
+  /** Tests for {@link FormulaWorksheetModel#getActiveCells()} */
+
   @Test
   public void getActiveCellsEmpty() {
     this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder().createWorksheet();

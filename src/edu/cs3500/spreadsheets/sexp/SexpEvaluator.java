@@ -121,7 +121,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param evalArg an evaluated S-exp
    * @return whether string rep of s-exp is an error
    */
-  static boolean isError(String evalArg) {
+  public static boolean isError(String evalArg) {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
   }

@@ -4,6 +4,7 @@ import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
+import edu.cs3500.spreadsheets.sexp.SexpEvaluator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -70,7 +71,7 @@ public class BeyondGood {
     boolean errorInWorksheet = false;
     for (Coord coord : model.getActiveCells()) {
       String cellEval = model.getEval(coord.col, coord.row);
-      if (cellEval.split(" ")[0].equals("!#ERROR")) {
+      if (SexpEvaluator.isError(cellEval)) {
         errorInWorksheet = true;
         System.out.println("Error in cell " + coord.toString() + ": " + cellEval);
       }
