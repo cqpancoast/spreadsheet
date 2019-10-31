@@ -3,6 +3,7 @@ package edu.cs3500.spreadsheets.model;
 import edu.cs3500.spreadsheets.model.WorksheetReader.WorksheetBuilder;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
+import edu.cs3500.spreadsheets.sexp.SexpEvaluator;
 import java.util.HashMap;
 
 /**
@@ -36,7 +37,7 @@ import java.util.HashMap;
 public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   private final HashMap<Coord, String> worksheet;
-  private final SExpEvaluatorFormulaWorksheet evaluator = new SExpEvaluatorFormulaWorksheet(this);
+  private final SexpEvaluator<String> evaluator = new SExpEvaluatorFormulaWorksheet(this);
 
   /**
    * Constructs a {@link FormulaWorksheetModel}.
