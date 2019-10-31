@@ -1,10 +1,13 @@
 package edu.cs3500.spreadsheets.model;
 
+import java.util.List;
+
 /**
  * Represents a worksheet in a spreadsheet application, in which there is a potentially infinite
  * grid with values. "Raw" values can be of any type, given by type param T. This interface supports
  * the idea of evaluation, that is, that by some process the evaluated contents of a cell will be
  * different from its raw contents. For ease of display, the evaluated contents are always Strings.
+ * Grid positions are represented by the prescription in the class {@link Coord}.
  * @param <T> type of raw cell contents
  */
 public interface WorksheetModel<T> { //HELP BLERNER what the heck are invariants? Also is our design good?
@@ -44,5 +47,12 @@ public interface WorksheetModel<T> { //HELP BLERNER what the heck are invariants
    * @return the column number of the valued cell with the largest column coordinate
    */
   int getMaxColumns();
+
+  /**
+   * Returns a list of the names of active cells in this worksheet. An example output would be a
+   * list with elements "A2", "D44", "WEED420".
+   * @return a list of names of active cells in this worksheet.
+   */
+  List<String> getActiveCells();
 
 }

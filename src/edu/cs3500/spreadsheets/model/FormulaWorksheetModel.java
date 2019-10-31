@@ -4,7 +4,9 @@ import edu.cs3500.spreadsheets.model.WorksheetReader.WorksheetBuilder;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
 import edu.cs3500.spreadsheets.sexp.SexpEvaluator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Represents a worksheet in which the raw value type of non-blank cells is a string literal
@@ -89,6 +91,15 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
       max = Math.max(c.col, max);
     }
     return max;
+  }
+
+  @Override
+  public List<String> getActiveCells() {
+    List<String> activeCellNames = new ArrayList<>();
+    for (Coord coord : this.worksheet.keySet()) {
+      activeCellNames.add(coord.toString());
+    }
+    return activeCellNames;
   }
 
   /**
