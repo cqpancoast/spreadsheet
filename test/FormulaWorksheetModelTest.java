@@ -377,8 +377,8 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(SUM D3:E3)");
     setModel("C3", "=(SUM E3:E4)");
     setModel("C4", "=(SUM D3:E4)");
-//    assertEquals("5.0", getEvalModel("C2"));
-//    assertEquals("6.5", getEvalModel("C3"));
+    assertEquals("5.0", getEvalModel("C2"));
+    assertEquals("6.5", getEvalModel("C3"));
     assertEquals("10.5", getEvalModel("C4"));
   }
 
@@ -388,9 +388,11 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(SUM D3 E4)");
     setModel("C3", "=(SUM D3 E4 D3)");
     setModel("C4", "=C2");
+    setModel("C5", "=(SUM (SUM 4 3) (PRODUCT 2.0 1))");
     assertEquals("7.5", getEvalModel("C2"));
     assertEquals("10.5", getEvalModel("C3"));
     assertEquals("7.5", getEvalModel("C4"));
+    assertEquals("10.0", getEvalModel("C5"));
   }
 
   @Test
@@ -399,9 +401,15 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(SUM C1 D3)");
     setModel("C3", "=(SUM B1 C1)");
     setModel("C4", "=(SUM D3 E3 C1)");
+    setModel("C5", "=(SUM)");
+    setModel("C6", "=(SUM true \"street\")");
+    setModel("C6", "=(SUM true 7 \"street\")");
     assertEquals("3.0", getEvalModel("C2"));
     assertEquals("0.0", getEvalModel("C3"));
     assertEquals("5.0", getEvalModel("C4"));
+    assertEquals("0.0", getEvalModel("C5"));
+    assertEquals("0.0", getEvalModel("C6"));
+    assertEquals("7.0", getEvalModel("C7"));
   }
 
   @Test
@@ -443,20 +451,28 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(PRODUCT D3 E4)");
     setModel("C3", "=(PRODUCT D3 E4 D3)");
     setModel("C4", "=C2");
+    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");
     assertEquals("13.5", getEvalModel("C2"));
     assertEquals("40.5", getEvalModel("C3"));
     assertEquals("13.5", getEvalModel("C4"));
+    assertEquals("27.0", getEvalModel("C5"));
   }
 
   @Test
-  public void getEval_formulae_PRODUCT_blankCells() {
+  public void getEval_formulae_PRODUCT_blankOrNonNumCells() {
     initWorksheetData();
     setModel("C2", "=(PRODUCT C1 D3)");
     setModel("C3", "=(PRODUCT B1 C1)");
     setModel("C4", "=(PRODUCT D3 E3 C1)");
+    setModel("C5", "=(PRODUCT)");
+    setModel("C6", "=(PRODUCT true \"street\")");
+    setModel("C6", "=(PRODUCT true 7 \"street\")");
     assertEquals("3.0", getEvalModel("C2"));
     assertEquals("0.0", getEvalModel("C3"));
     assertEquals("6.0", getEvalModel("C4"));
+    assertEquals("0.0", getEvalModel("C5"));
+    assertEquals("0.0", getEvalModel("C6"));
+    assertEquals("7.0", getEvalModel("C7"));
   }
 
   @Test
@@ -487,9 +503,11 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(< E3 D3)");
     setModel("C3", "=(< E4 E3)");
     setModel("C4", "=(< D3 D3)");
+    setModel("C5", "=(< (PRODUCT 1 2.9) (SUM 3.0 2.89))");
     assertEquals("true", getEvalModel("C2"));
     assertEquals("false", getEvalModel("C3"));
     assertEquals("false", getEvalModel("C4"));
+    assertEquals("true", getEvalModel("C5"));
   }
 
   @Test
