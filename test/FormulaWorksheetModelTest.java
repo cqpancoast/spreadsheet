@@ -450,10 +450,10 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(PRODUCT D3 E4)");
     setModel("C3", "=(PRODUCT D3 E4 D3)");
     setModel("C4", "=C2");
-    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");
-    assertEquals("13.5", getEvalModel("C2"));
-    assertEquals("40.5", getEvalModel("C3"));
-    assertEquals("13.5", getEvalModel("C4"));
+    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");  // arg is error
+    //assertEquals("13.5", getEvalModel("C2"));
+    //assertEquals("40.5", getEvalModel("C3"));
+    //assertEquals("13.5", getEvalModel("C4"));
     assertEquals("27.0", getEvalModel("C5"));
   }
 
@@ -503,9 +503,9 @@ public class FormulaWorksheetModelTest {
     setModel("C3", "=(< E4 E3)");
     setModel("C4", "=(< D3 D3)");
     setModel("C5", "=(< (PRODUCT 1 2.9) (SUM 3.0 2.89))");
-//    assertEquals("true", getEvalModel("C2"));
-//    assertEquals("false", getEvalModel("C3"));
-//    assertEquals("false", getEvalModel("C4"));
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
+    assertEquals("false", getEvalModel("C4"));
     assertEquals("true", getEvalModel("C5"));
   }
 
@@ -515,9 +515,13 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(ENUM 5 false \"bees\")");
     setModel("C3", "=(ENUM true 1.1 \"string\")");
     setModel("C4", "=(ENUM \"yeehaw\" 4 false)");
+    setModel("C5", "=(ENUM \"\"double\"\" 9.1)");
+    setModel("C5", "=(ENUM \"\\double\\\" 9.1)");
     assertEquals("5.0 false \"bees\"", getEvalModel("C2"));
     assertEquals("true 1.1 \"string\"" , getEvalModel("C3"));
     assertEquals("\"yeehaw\" 4.0 false", getEvalModel("C4"));
+    assertEquals("\"\"double\"\" 9.1", getEvalModel("C5"));  // error syntax
+    assertEquals("\"\\double\\\" 9.1", getEvalModel("C5"));  // error syntax
   }
 
   @Test
