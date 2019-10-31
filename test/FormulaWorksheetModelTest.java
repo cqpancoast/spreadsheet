@@ -1,4 +1,6 @@
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
@@ -74,8 +76,6 @@ public class FormulaWorksheetModelTest {
     return this.model.getEval(fromString.get(0), fromString.get(1));
   }
 
-  //TODO write some methods that initialize formulas into the model worksheet we're working with
-
   /** Test for {@link FormulaWorksheetModel#FormulaWorksheetModel(HashMap)}. */
 
   @Test(expected = IllegalArgumentException.class)
@@ -88,27 +88,48 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void builder_noArgs() {
-
+    FormulaWorksheetModel model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
+        .createWorksheet();
+    assertNull(model.getRaw(4, 3));
+    assertNull(model.getRaw(5, 3));
+    assertEquals("", model.getEval(4, 3));
+    assertEquals("", model.getEval(5, 3));
   }
 
   @Test
   public void builder_genericCall() {
-
+    FormulaWorksheetModel model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
+        .createCell(4, 3, "3").createCell(5, 3, "2")
+        .createCell(4, 4, "1.00").createCell(5, 3, "4.5")
+        .createWorksheet();
+    assertEquals("3", model.getRaw(4, 3));
+    assertEquals("4.5", model.getRaw(5, 3));
   }
 
   @Test(expected = IllegalArgumentException.class) // from Coord constructor
   public void builder_negativeIndices() {
-
+    new FormulaWorksheetModel.FormulaWorksheetBuilder().createCell(1, 1, "4")
+        .createCell(4, -2, "");
   }
 
   @Test
   public void builder_overwrittenCells() {
-
+    FormulaWorksheetModel model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
+        .createCell(4, 3, "3").createCell(5, 3, "2")
+        .createCell(4, 4, "1.00").createCell(4, 3, "4.5")
+        .createWorksheet();
+    assertEquals("2", model.getRaw(5, 3));
+    assertEquals("4.5", model.getRaw(4, 3));
   }
 
   @Test
   public void builder_canBuildInvalidWorksheets() {
-
+    FormulaWorksheetModel model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
+        .createCell(4, 3, "3").createCell(5, 3, "2")
+        .createCell(4, 4, "=(< 4)")
+        .createWorksheet();
+    assertEquals("2.0", model.getEval(5, 3));
+    assertEquals(errorInvalidArity, model.getEval(4, 4));
   }
   // All other tests for the builder are implicit in the below test suite.
 
@@ -116,12 +137,19 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void set_genericCall() {
-
+    initWorksheetData();
+    setModel("C2", "3");
+    setModel("C3", "true");
+    setModel("C4", "\"string\"");
+    assertEquals("3", getRawModel("C2"));
+    assertEquals("true", getRawModel("C3"));
+    assertEquals("\"string\"", getRawModel("C4"));
   }
 
   @Test(expected = IllegalArgumentException.class) // from Coord constructor
   public void set_negativeIndices() {
-
+    initWorksheetData();
+    this.model.set(-1, 3, "");
   }
 
   @Test
@@ -134,12 +162,20 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void set_deletedCells() {
-
+    this.initWorksheetData();
+    assertEquals("0", getRawModel("D2"));
+    setModel("D2", null);
+    assertNull(getRawModel("D2"));
+    setModel("D2", "34");
+    assertEquals("34", getRawModel("D2"));
   }
 
   @Test
   public void set_canMakeInvalidWorksheets() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    assertEquals("3.0", getEvalModel("D3"));
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
   }
   // All other tests for set are implicit in all of the below tests.
 
@@ -153,93 +189,105 @@ public class FormulaWorksheetModelTest {
 
   //* VALUES: Things go right *//
   @Test
-  public void getEval_values_redundantDoubleReducesToInt() {
-
-  }
-
-  @Test
-  public void getEval_values_basicallyInt() {
-
-  }
-
-  @Test
   public void getEval_values_double() {
-
+    initWorksheetData();
+    setModel("C2", "54");
+    setModel("C3", "32.4");
+    setModel("C4", "=(SUM 3 2)");
+    assertEquals("54.0", getEvalModel("C2"));
+    assertEquals("32.4", getEvalModel("C3"));
+    assertEquals("5.0", getEvalModel("C4"));
   }
 
   @Test
   public void getEval_values_boolean() {
-
+    initWorksheetData();
+    setModel("C2", "true");
+    setModel("C3", "false");
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_values_stringGeneric() {
-
+    initWorksheetData();
+    setModel("C2", "\"yeet\"");
+    setModel("C3", "\"yeehaw\"");
+    assertEquals("\"yeet\"", getEvalModel("C2"));
+    assertEquals("\"yeehaw\"", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_values_stringBoolean() {
-
+    initWorksheetData();
+    setModel("C2", "\"true\"");
+    setModel("C3", "\"false\"");
+    assertEquals("\"true\"", getEvalModel("C2"));
+    assertEquals("\"false\"", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_values_stringDouble() {
-
-  }
-
-  @Test
-  public void getEval_values_doubleString() {
-
+    initWorksheetData();
+    setModel("C2", "\"4.2\"");
+    setModel("C3", "\"3.0\"");
+    assertEquals("\"4.2\"", getEvalModel("C2"));
+    assertEquals("\"3.0\"", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_values_emptyString() {
-
+    initWorksheetData();
+    setModel("C2", "\"\"");
+    assertEquals("\"\"", getEvalModel("C2"));
   }
 
   //* VALUES: Invalid syntax (basically just symbols) *//
   @Test
   public void getEval_values_randomSymbol() {
-
+    initWorksheetData();
+    setModel("C2", "SUM PRODUCT");
+    assertEquals(errorSyntax, getEvalModel("C2"));
   }
 
-  @Test
-  public void getEval_values_emptySymbol() {
-
-  }
   // Evaluation when symbols are references are covered below.
   
   //** FORMULAE **//
 
   //* FORMULAE: Just values *//
-  @Test
-  public void getEval_formulae_redundantDoubleReducesToInt() {
-
-  }
-
-  @Test
-  public void getEval_formulae_basicallyInt() {
-
-  }
 
   @Test
   public void getEval_formulae_double() {
-
+    initWorksheetData();
+    setModel("C2", "=4");
+    setModel("C3", "=3.1");
+    assertEquals("4.0", getEvalModel("C2"));
+    assertEquals("3.1", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_boolean() {
-
+    initWorksheetData();
+    setModel("C2", "=true");
+    setModel("C3", "=false");
+    assertEquals("true", getEvalModel("C2"));
+    assertEquals("false", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_string() {
-
+    initWorksheetData();
+    setModel("C2", "=\"string\"");
+    setModel("C3", "=\"street\"");
+    assertEquals("\"string\"", getEvalModel("C2"));
+    assertEquals("\"street\"", getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_randomSymbol() {
-
+    initWorksheetData();
+    setModel("C2", "RANDOM");
+    assertEquals(errorSyntax, getEvalModel("C2"));
   }
 
   //* FORMULAE: Just references *//
@@ -267,27 +315,36 @@ public class FormulaWorksheetModelTest {
 
   @Test
   public void getEval_formulae_errorPropagatesThroughReference() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    setModel("C3", "=C2");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorInvalidArity, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_differentError() {
-
+    initWorksheetData();
+    setModel("C2", "=C3");
+    setModel("C3", "=C2");
+    setModel("C4", "=C4");
+    assertEquals(errorCyclicRef, getEvalModel("C2"));
+    assertEquals(errorCyclicRef, getEvalModel("C3"));
+    assertEquals(errorCyclicRef, getEvalModel("C4"));
   }
 
   @Test
   public void getEval_formulae_attemptedEvaluationOfReferenceBlock() {
-
+    initWorksheetData();
+    setModel("C2", "=D3:E4");
+    assertEquals(errorInvalidBlockCellRef, getEvalModel("C2"));
   }
 
   @Test
   public void getEval_formulae_referenceCannotBeInParens() {
-
-  }
-
-  @Test
-  public void getEval_formulae_justReferenceMustBeginWithEqualsSign() {
-
+    initWorksheetData();
+    setModel("C2", "=(D3)");
+    assertEquals(errorInvalidCommand, getEvalModel("C2"));
   }
 
   //* FORMULAE: Functions *//
@@ -329,16 +386,12 @@ public class FormulaWorksheetModelTest {
   @Test
   public void getEval_formulae_SUM_mixOfReferents() {
     initWorksheetData();
-    setModel("C2", "=(SUM D3:E4 4.2)");
-    setModel("C3", "=(SUM D3:E4 D3)");
-    setModel("C4", "=(SUM (SUM D3 D4) (SUM E3 E4))");
-    setModel("C5", "=C6");
-    setModel("C6", "=(SUM D3 E4)");
-    assertEquals("14.7", getEvalModel("C2"));
-    assertEquals("13.5", getEvalModel("C3"));
-    //assertEquals("10.5", getEvalModel("C4"));
-    assertEquals("7.5", getEvalModel("C5"));
-    assertEquals("7.5", getEvalModel("C6"));
+    setModel("C2", "=(SUM D3 E4)");
+    setModel("C3", "=(SUM D3 E4 D3)");
+    setModel("C4", "=C2");
+    assertEquals("7.5", getEvalModel("C2"));
+    assertEquals("10.5", getEvalModel("C3"));
+    assertEquals("7.5", getEvalModel("C4"));
   }
 
   @Test
@@ -388,16 +441,12 @@ public class FormulaWorksheetModelTest {
   @Test
   public void getEval_formulae_PRODUCT_mixOfReferents() {
     initWorksheetData();
-    setModel("C2", "=(PRODUCT D3:E4 4.2)");
-    setModel("C3", "=(PRODUCT D3:E4 D3)");
-    setModel("C4", "=(PRODUCT (SUM D3:E4) 13.2 (PRODUCT E3:E4))");
-    setModel("C5", "=C6");
-    setModel("C6", "=(PRODUCT D3 E4)");
-    assertEquals("113.4", getEvalModel("C2"));
-    assertEquals("81.0", getEvalModel("C3"));
-    assertEquals("3207.6", getEvalModel("C4"));
-    assertEquals("13.5", getEvalModel("C5"));
-    assertEquals("13.5", getEvalModel("C6"));
+    setModel("C2", "=(PRODUCT D3 E4)");
+    setModel("C3", "=(PRODUCT D3 E4 D3)");
+    setModel("C4", "=C2");
+    assertEquals("13.5", getEvalModel("C2"));
+    assertEquals("40.5", getEvalModel("C3"));
+    assertEquals("13.5", getEvalModel("C4"));
   }
 
   @Test
@@ -507,142 +556,181 @@ public class FormulaWorksheetModelTest {
     assertEquals(errorInvalidCommand, getEvalModel("C2"));
   }
 
-  @Test
-  public void getEval_formulae_bogusCommandLikeThing() {
-
-  }
-
-  @Test
-  public void getEval_formulae_bogusCommandLikeThing2() {
-
-  }
-
-  @Test
-  public void getEval_formulae_SUM_incorrect() {
-
-  }
-
   // Functions: Invalid arguments //
   @Test
   public void getEval_formulae_SUM_errorProp() {
-
-  }
-
-  @Test
-  public void getEval_formulae_SUM_incorrectNumArgs() {
-
-  }
-
-  @Test
-  public void getEval_formulae_SUM_incorrectArgType() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    setModel("C3", "=(SUM C2 3 6)");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorArgIsError, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_PRODUCT_errorProp() {
-
-  }
-
-  @Test
-  public void getEval_formulae_PRODUCT_incorrectNumArgs() {
-
-  }
-
-  @Test
-  public void getEval_formulae_PRODUCT_incorrectArgType() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    setModel("C3", "=(PRODUCT C2 3 6)");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorArgIsError, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_errorProp() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    setModel("C3", "=(< C2 6)");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorArgIsError, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_incorrectNumArgs() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4 5 7)");
+    setModel("C3", "=(< 6)");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorInvalidArity, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_incorrectArgType() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4 true)");
+    setModel("C3", "=(< \"string\" 6)");
+    assertEquals(errorArgType, getEvalModel("C2"));
+    assertEquals(errorArgIsError, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_blockReferents() {
-
+    initWorksheetData();
+    setModel("C2", "=(< D4:E4 3)");
+    setModel("C3", "=(< D5:E5 false)");
+    assertEquals(errorArgIsError, getEvalModel("C2"));
   }
 
   @Test
   public void getEval_formulae_LESSTHAN_blankCells() {
-
-  }
-
-  @Test
-  public void getEval_formulae_ENUM_noArgs() {
-
+    initWorksheetData();
+    setModel("C2", "=(< D2 E2)");
+    setModel("C3", "=(< E2 5)");
+    assertEquals(errorArgType, getEvalModel("C2"));
+    assertEquals(errorArgType, getEvalModel("C3"));
   }
 
   @Test
   public void getEval_formulae_ENUM_errorProp() {
-
+    initWorksheetData();
+    setModel("C2", "=(< 4)");
+    setModel("C3", "=(ENUM C2");
+    assertEquals(errorInvalidArity, getEvalModel("C2"));
+    assertEquals(errorSyntax, getEvalModel("C3"));
   }
 
   /** Tests for {@link FormulaWorksheetModel#getRaw(int, int)}. */
   
   @Test
   public void getRaw_doubleWithUnnecessaryDecimals() {
-
+    initWorksheetData();
+    setModel("C2", "4.0000");
+    setModel("C3", "-3.00");
+    assertEquals("4.0000", getRawModel("C2"));
+    assertEquals("-3.00", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_doubleWithNecessaryDecimals() {
-
+    initWorksheetData();
+    setModel("C2", "4.21");
+    setModel("C3", "-3.93");
+    assertEquals("4.21", getRawModel("C2"));
+    assertEquals("-3.93", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_doubleNoDecimals() {
-
+    initWorksheetData();
+    setModel("C2", "4");
+    setModel("C3", "-3");
+    assertEquals("4", getRawModel("C2"));
+    assertEquals("-3", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_string() {
-
+    initWorksheetData();
+    setModel("C2", "\"string\"");
+    setModel("C3", "\"street\"");
+    assertEquals("\"string\"", getRawModel("C2"));
+    assertEquals("\"street\"", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_boolean() {
-
+    initWorksheetData();
+    setModel("C2", "true");
+    setModel("C3", "false");
+    assertEquals("true", getRawModel("C2"));
+    assertEquals("false", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_singleReference() {
-
+    initWorksheetData();
+    setModel("C2", "=D3");
+    setModel("C3", "=E3");
+    assertEquals("=D3", getRawModel("C2"));
+    assertEquals("=E3", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_groupReference() {
-
+    initWorksheetData();
+    setModel("C2", "=D3:E3");
+    setModel("C3", "=D4:E4");
+    assertEquals("=D3:E3", getRawModel("C2"));
+    assertEquals("=D4:E4", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_cyclicReference() {
-
+    initWorksheetData();
+    setModel("C2", "=C3");
+    setModel("C3", "=C2");
+    assertEquals("=C3", getRawModel("C2"));
+    assertEquals("=C2", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_validFormula() {
-
+    initWorksheetData();
+    setModel("C2", "=(SUM 4 3)");
+    setModel("C3", "=(PRODUCT 2 8 1)");
+    setModel("C4", "=(< 3 6)");
+    setModel("C5", "=(ENUM 3 true \"str\")");
+    assertEquals("=(SUM 4 3)", getRawModel("C2"));
+    assertEquals("=(PRODUCT 2 8 1)", getRawModel("C3"));
+    assertEquals("=(< 3 6)", getRawModel("C4"));
+    assertEquals("=(ENUM 3 true \"str\")", getRawModel("C5"));
   }
 
   @Test
   public void getRaw_invalidFormula() {
-
+    initWorksheetData();
+    setModel("C2", "=invalid");
+    setModel("C3", "=MoReInVaLiD");
+    assertEquals("=invalid", getRawModel("C2"));
+    assertEquals("=MoReInVaLiD", getRawModel("C3"));
   }
 
   @Test
   public void getRaw_youCanPutANYTHINGInThisThing() {
-
+    initWorksheetData();
+    setModel("C2", "ewpgvjneo[vjn");
+    setModel("C3", "=${ORN{O SUM aev[n");
+    assertEquals("ewpgvjneo[vjn", getRawModel("C2"));
+    assertEquals("=${ORN{O SUM aev[n", getRawModel("C3"));
   }
 
   /** Tests for {@link FormulaWorksheetModel#getMaxRows()}. */
@@ -760,5 +848,4 @@ public class FormulaWorksheetModelTest {
 //  public void isValid_invalidFunctionSyntax() {
 //
 //  }
-
 }
