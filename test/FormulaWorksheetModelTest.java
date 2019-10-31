@@ -5,7 +5,10 @@ import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
 
@@ -843,4 +846,29 @@ public class FormulaWorksheetModelTest {
     assertEquals(0, model.getMaxColumns());
   }
 
+  @Test
+  public void getActiveCellsEmpty() {
+    this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder().createWorksheet();
+    assertEquals(new HashSet<Coord>(), model.getActiveCells());
+  }
+
+  @Test
+  public void getActiveCells() {
+    initWorksheetData();
+    HashSet<Coord> set = new HashSet<Coord>();
+    set.add(new Coord(4, 2));
+    set.add(new Coord(4, 3));
+    set.add(new Coord(5, 3));
+    set.add(new Coord(4, 4));
+    set.add(new Coord(5, 4));
+    set.add(new Coord(4, 5));
+    set.add(new Coord(5, 5));
+    set.add(new Coord(4, 6));
+    set.add(new Coord(5, 6));
+    set.add(new Coord(4, 7));
+    set.add(new Coord(5, 7));
+    set.add(new Coord(4, 8));
+    set.add(new Coord(5, 8));
+    assertEquals(set, model.getActiveCells());
+  }
 }
