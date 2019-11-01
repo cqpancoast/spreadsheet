@@ -549,11 +549,13 @@ public class FormulaWorksheetModelTest {
   public void getEval_formulae_ENUM_mixOfReferents() {
     initWorksheetData();
     setModel("C2", "=(ENUM D3 D7)");
-    setModel("C3", "=(ENUM D3 D4  E6 E7)");
+    setModel("C3", "=(ENUM D3 D4 E6:E7)");
     setModel("C4", "=(ENUM D5 E7)");
+    setModel("C5", "=(ENUM C3 C4)");
     assertEquals("3.0 \"true\"", getEvalModel("C2"));
     assertEquals("3.0 1.0 \"friend\" \"7.0\"" , getEvalModel("C3"));
     assertEquals("true \"7.0\"", getEvalModel("C4"));
+    assertEquals("3.0 1.0 \"friend\" \"7.0\" true \"7.0\"", getEvalModel("C5"));
   }
 
   @Test
