@@ -77,7 +77,13 @@ public class BeyondGood {
       }
     }
     if (!errorInWorksheet) {
-      System.out.println(model.getEval(evalCellCoord.col, evalCellCoord.row));
+      String eval = model.getEval(evalCellCoord.col, evalCellCoord.row);
+      try {
+        double dub = Double.parseDouble(eval);
+        System.out.print(String.format("%f", dub));
+      } catch (NumberFormatException e) {
+        System.out.print(model.getEval(evalCellCoord.col, evalCellCoord.row));
+      }
     }
   }
 

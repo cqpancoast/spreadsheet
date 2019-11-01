@@ -104,7 +104,16 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       return errorCyclicRef;
     }
     List<Integer> refCoord = Coord.fromString(ref);
-    return this.evaluate(this.model.getRaw(refCoord.get(0), refCoord.get(1)));
+    String rawCellVal = this.model.getRaw(refCoord.get(0), refCoord.get(1));
+    try {
+      if (rawCellVal.replace(" ", "").substring(0, 2).equals("=(")) {
+        return new SExpEvaluatorFormulaWorksheet(this.model).evaluate(rawCellVal);
+      } else {
+        return this.evaluate(rawCellVal);
+      }
+    } catch (Exception e) {
+      return this.evaluate(rawCellVal);
+    }
   }
 
   /**
