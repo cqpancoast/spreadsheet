@@ -46,7 +46,7 @@ public class BeyondGood {
   }
 
   /**
-   * Determine whether main's args follow the format: -in some-filename -eval some-cellname
+   * Determine whether main's args follow the format: "-in some-filename -eval some-cellname".
    * @param args main args
    * @return whether args follow the correct format
    */

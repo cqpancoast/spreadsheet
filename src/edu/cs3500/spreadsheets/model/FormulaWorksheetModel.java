@@ -77,7 +77,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
   @Override
   public int getMaxRows() {
     int max = 0;
-    for (Coord c : this.worksheet.keySet()) { //HELP BLERNER one-line this? Coll.max(wksht.keySet.rows)?
+    for (Coord c : this.worksheet.keySet()) {
       max = Math.max(c.row, max);
     }
     return max;

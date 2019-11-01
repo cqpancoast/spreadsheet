@@ -160,7 +160,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     public String visitSList(List<Sexp> args) {
       T accumulator = this.initializeValue();
       for (Sexp arg : args) {
-        //If the sexp is a list, it should be evaluated by a new evaluator from the start
+        //If the sexp is a list, then it is a command and should be evaluated by a new evaluator
         String evalArg;
         if (arg.toString().indexOf("(") == 0) {
           evalArg = new SExpEvaluatorFormulaWorksheet(super.model).evaluate(arg);
@@ -205,7 +205,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Sums all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<StringBuilder> {
+  private static final class SexpEvaluatorSum extends SexpEvaluatorAccumulator<StringBuilder> {
 
     /**
      * Constructs a {@link SexpEvaluatorSum}.
@@ -248,7 +248,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Multiplies all sexp arguments in the input list that can be interpreted as doubles. Blanks are
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
-  private final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<StringBuilder> {
+  private static final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<StringBuilder> {
 
     /**
      * Constructs a {@link SexpEvaluatorProduct}.
@@ -339,7 +339,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       }
       if (isError(arg1Eval) || isError(arg2Eval)) {
         return errorArgIsError;
-      } try {
+      }
+      try {
         return String.valueOf(Double.parseDouble(arg1Eval) < Double.parseDouble(arg2Eval));
       } catch (NumberFormatException e) {
 
@@ -391,10 +392,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Given a string specifying worksheet cells that are at the corners of some region, iterates over
    * the cells in that region.
    */
-  private final static class BlockReferenceIterator implements Iterator<String> {
+  private static final class BlockReferenceIterator implements Iterator<String> {
 
-    private final int startCol, startRow, endCol, endRow;
-    private int col, row;
+    private final int startCol;
+    private final int startRow;
+    private final int endCol;
+    private final int endRow;
+    private int col;
+    private int row;
 
     /**
      * Creates a new {@link BlockReferenceIterator}.

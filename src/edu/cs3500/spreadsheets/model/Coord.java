@@ -12,6 +12,11 @@ public class Coord {
   public final int row;
   public final int col;
 
+  /**
+   * Constructs a {@link Coord}.
+   * @param col this's column
+   * @param row this's row
+   */
   public Coord(int col, int row) {
     if (row < 1 || col < 1) {
       throw new IllegalArgumentException("Coordinates should be strictly positive");

@@ -177,11 +177,9 @@ public class FormulaWorksheetModelTest {
   }
   // All other tests for set are implicit in all of the below tests.
 
-  /** Tests for {@link FormulaWorksheetModel#getEval(int, int)}.
-   *
-   * This testing section is split into subsections to account for the many different types of
-   * evaluation procedures that can go on. Effectively, this acts as the testing suite for
-   * {@link SExpEvaluatorFormulaWorksheet}. */
+  /** Tests for {@link FormulaWorksheetModel#getEval(int, int)}. This testing section is split into
+   * subsections to account for the many different types of evaluation procedures that can go on.
+   * Effectively, this acts as the testing suite for {@link SExpEvaluatorFormulaWorksheet}. */
 
   //** VALUES **//
 
@@ -450,7 +448,7 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(PRODUCT D3 E4)");
     setModel("C3", "=(PRODUCT D3 E4 D3)");
     setModel("C4", "=C2");
-    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 4.5))");
+    setModel("C5", "=(PRODUCT (SUM 1 2) (PRODUCT 2 E4))");
     assertEquals("13.5", getEvalModel("C2"));
     assertEquals("40.5", getEvalModel("C3"));
     assertEquals("13.5", getEvalModel("C4"));
@@ -543,7 +541,8 @@ public class FormulaWorksheetModelTest {
     setModel("C4", "=(ENUM D5:E7)");
     assertEquals("3.0 1.0 true \"bees\" \"true\"", getEvalModel("C2"));
     assertEquals("3.0 1.0  \"friend\" \"7.0\"" , getEvalModel("C3"));
-    assertEquals("true false \"bees\" \"friend\" \"true\" \"7.0\"", getEvalModel("C4"));
+    assertEquals("true false \"bees\" \"friend\" \"true\" \"7.0\"",
+        getEvalModel("C4"));
   }
 
   @Test
@@ -844,7 +843,7 @@ public class FormulaWorksheetModelTest {
     assertEquals(0, model.getMaxColumns());
   }
 
-  /** Tests for {@link FormulaWorksheetModel#getActiveCells()} */
+  /** Tests for {@link FormulaWorksheetModel#getActiveCells()}. */
 
   @Test
   public void getActiveCellsEmpty() {
