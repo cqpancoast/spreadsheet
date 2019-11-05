@@ -1,7 +1,8 @@
-package edu.cs3500.spreadsheets.sexp;
+package edu.cs3500.spreadsheets.model;
 
-import edu.cs3500.spreadsheets.model.Coord;
-import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
+import edu.cs3500.spreadsheets.sexp.SList;
+import edu.cs3500.spreadsheets.sexp.SSymbol;
+import edu.cs3500.spreadsheets.sexp.Sexp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
   @Override
   protected String errorEvaluant() {
-    return SexpEvaluator.errorSyntax;
+    return errorSyntax;
   }
 
   @Override

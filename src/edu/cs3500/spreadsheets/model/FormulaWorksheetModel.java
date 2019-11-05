@@ -1,10 +1,9 @@
 package edu.cs3500.spreadsheets.model;
 
 import edu.cs3500.spreadsheets.model.WorksheetReader.WorksheetBuilder;
-import edu.cs3500.spreadsheets.sexp.SExpEvaluatorFormulaWorksheet;
 import edu.cs3500.spreadsheets.sexp.Sexp;
-import edu.cs3500.spreadsheets.sexp.SexpEvaluator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -94,7 +93,7 @@ public class FormulaWorksheetModel implements WorksheetModel<String> {
 
   @Override
   public Set<Coord> getActiveCells() {
-    return this.worksheet.keySet();
+    return new HashSet<Coord>(this.worksheet.keySet());
   }
 
   /**

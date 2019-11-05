@@ -7,7 +7,6 @@ import java.util.Set;
  * grid with values. "Raw" values can be of any type, given by type param T. This interface supports
  * the idea of evaluation, that is, that by some process the evaluated contents of a cell will be
  * different from its raw contents. For ease of display, the evaluated contents are always Strings.
- * Grid positions are represented by the prescription in the class {@link Coord}.
  * @param <T> type of raw cell contents
  */
 public interface WorksheetModel<T> {
