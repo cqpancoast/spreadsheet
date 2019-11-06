@@ -33,13 +33,18 @@ public class TextualWorksheetView implements WorksheetView {
 
   @Override
   public String toString() {
-    StringBuilder view = new StringBuilder();
-    for (int i = 1; i <= model.getMaxColumns(); i++) {
-      for (int j = 1; j <= model.getMaxRows(); j++) {
-        view.append(Coord.colIndexToName(i)).append(j).append(" ");
-        view.append(model.getRaw(i, j)).append("\n");
+    StringBuilder viewString = new StringBuilder();
+    int maxCols = model.getMaxColumns();
+    int maxRows = model.getMaxRows();
+    for (int i = 1; i <= maxCols; i++) {
+      for (int j = 1; j <= maxRows; j++) {
+        viewString.append(Coord.colIndexToName(i)).append(j).append(" ");
+        viewString.append(model.getRaw(i, j));
+        if (!(i == maxCols && j == maxRows)) {
+          viewString.append("\n");
+        }
       }
     }
-    return view.toString();
+    return viewString.toString();
   }
 }
