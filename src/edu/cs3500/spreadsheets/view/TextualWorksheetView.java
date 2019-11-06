@@ -5,7 +5,10 @@ import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.io.IOException;
 
 /**
- * TODO javadoc
+ * Represents a {@link WorksheetModel} textually, saving this representation to some appendable. The
+ * representation is an unordered set of cell-value pairs, with the scheme "[cell] [value]" for each
+ * line in the file. The cell is the string representation of a cells position in the grid according
+ * to the convention in {@link Coord}, while value is the <i>unevaluated</i> contents of that cell.
  */
 public class TextualWorksheetView implements WorksheetView {
   private final WorksheetModel<?> model;
