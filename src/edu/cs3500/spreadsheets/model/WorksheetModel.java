@@ -51,6 +51,6 @@ public interface WorksheetModel<T> {
    * Returns a list of {@link Coord}s for positions of active cells.
    * @return a list of coordinates of active cells in this worksheet.
    */
-  Set<Coord> getActiveCells(); //NOTE explicit coupling good design?
+  Set<Coord> getActiveCells();
 
 }

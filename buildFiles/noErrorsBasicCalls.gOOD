@@ -1,15 +1,15 @@
 A1 0
-A2 \"string\"
+A2 "string"
 A3 true
 A4 -4.9
-A5 \"true\"
+A5 "true"
 B1 2.1
-B2 \"yeet\"
+B2 "yeet"
 B3 false
 B4 8.76
-B5 \"false\"
+B5 "false"
 C1 =(SUM 2.1 5 7.43)
-C2 =(ENUM false \"street\" 3.2)
+C2 =(ENUM false "street" 3.2)
 C3 =(PRODUCT 8.3 9 -1.0)
 C4 =(< 6.1 10.5)
 C5 =(SUM A1 B1 A4 B4)
