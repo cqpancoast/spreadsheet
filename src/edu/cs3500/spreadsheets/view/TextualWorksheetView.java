@@ -1,5 +1,6 @@
 package edu.cs3500.spreadsheets.view;
 
+import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.io.IOException;
 
@@ -31,7 +32,14 @@ public class TextualWorksheetView implements WorksheetView {
   }
 
   @Override
-  public String toString() { //TODO
-    return null;
+  public String toString() {
+    StringBuilder view = new StringBuilder();
+    for (int i = 1; i <= model.getMaxColumns(); i++) {
+      for (int j = 1; j <= model.getMaxRows(); j++) {
+        view.append(Coord.colIndexToName(i)).append(j).append(" ");
+        view.append(model.getRaw(i, j)).append("\n");
+      }
+    }
+    return view.toString();
   }
 }
