@@ -2,59 +2,103 @@ package edu.cs3500.spreadsheets;
 
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
+import edu.cs3500.spreadsheets.model.SexpEvaluator;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
-import edu.cs3500.spreadsheets.model.SexpEvaluator;
+import edu.cs3500.spreadsheets.view.GridWorksheetView;
+import edu.cs3500.spreadsheets.view.TextualWorksheetView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.StringReader;
 import java.util.List;
 
 /**
  * The main class for our program.
  */
 public class BeyondGood {
+
   /**
    * The main entry point.
    * @param args any command-line arguments
    */
   public static void main(String[] args) {
 
+    // Check if the command arguments are well formed
     if (!wellFormedCommand(args)) {
       System.out.println("Malformed command arguments. You're better than this.");
       return;
     }
 
-    String fileName = args[1];
-    String cellName = args[3];
-
-    WorksheetModel<String> model;
-    try {
-      model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
-          new BufferedReader(new FileReader(new File(fileName))));
-    } catch (Exception e) {
-      System.out.println("Error creating worksheet model:\n" + e.getMessage());
-      return;
+    // Create the model from the file, if one is provided
+    WorksheetModel<?> model = null;
+    if (args[0].equals("-gui")) {
+      try {
+        model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
+            new StringReader(""));
+      } catch (Exception e) {
+        System.out.println("Error creating worksheet model:\n" + e.getMessage());
+      }
+    } else if (args[0].equals("-in")) {
+      String fileName = args[1];
+      try {
+        model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
+            new BufferedReader(new FileReader(new File(fileName))));
+      } catch (Exception e) {
+        System.out.println("Error creating worksheet model:\n" + e.getMessage());
+        return;
+      }
     }
 
-    try {
-      evaluateCellInWorksheet(model, cellName);
-    } catch (Exception e) {
-      System.out.println("Error during cell evaluation process:\n" + e.getMessage());
+    // Display the correct thing given the model
+    if (args[2].equals("-eval")) {
+      try {
+        evaluateCellInWorksheet(model, args[3]);
+      } catch (Exception e) {
+        System.out.println("Error in cell evaluation, man.");
+      }
+    } else if (args[2].equals("-save")) {
+      try {
+        new TextualWorksheetView(model, new FileWriter(new File(args[3]))).render();
+      } catch (Exception e) {
+        System.out.println("Error in saving file, man.");
+      }
+    } else if (args[2].equals("-gui") || args[0].equals("-gui")) {
+      try {
+        new GridWorksheetView(model).render();
+      } catch (Exception e) {
+        System.out.println("Error in displaying grid, man.");
+      }
     }
 
   }
 
   /**
-   * Determine whether main's args follow the format: "-in some-filename -eval some-cellname".
+   * Determine whether main's args follow one of several formats:
+   * - -in [some-filename] -eval [some-cell]
+   * - -in [some-filename] -save [some-new-filename]
+   * - -in [some-filename] -gui
+   * - -gui
+   * Does not check for validity of file name, but does check for validity of cell name.
    * @param args main args
    * @return whether args follow the correct format
    */
   private static boolean wellFormedCommand(String[] args) {
-    return args.length == 4
-        && args[0].equals("-in")
-        && args[2].equals("-eval")
-        && Coord.validCellName(args[3]);
+    if (args[0].equals("-gui")) {
+      return args.length == 1;
+    } else if (args[0].equals("-in")) {
+      if (args.length == 4) {
+        if (args[2].equals("-eval")) {
+          return Coord.validCellName(args[3]);
+        } else if (args[2].equals("-save")) {
+          return true;
+        }
+      } else if (args.length == 3) {
+        return args[2].equals("-gui");
+      }
+    }
+    return false;
   }
 
   /**
@@ -65,7 +109,7 @@ public class BeyondGood {
    * @param evalCellName a string representation of the cell to evaluate's position in the
    *                     worksheet grid
    */
-  private static void evaluateCellInWorksheet(WorksheetModel<String> model, String evalCellName) {
+  private static void evaluateCellInWorksheet(WorksheetModel<?> model, String evalCellName) {
     List<Integer> evalCellPosn = Coord.fromString(evalCellName);
     Coord evalCellCoord = new Coord(evalCellPosn.get(0), evalCellPosn.get(1));
     boolean errorInWorksheet = false;

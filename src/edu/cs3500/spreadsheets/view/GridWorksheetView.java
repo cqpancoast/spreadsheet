@@ -7,7 +7,9 @@ import edu.cs3500.spreadsheets.model.WorksheetModel;
  * infinite by definition, this view is limited to displaying everything with a column or row less
  * than the cell with the largest row and column. Bars are put at the top and the left of the view
  * that have A, B, C... and 1, 2, 3... spaced to be in line with the columns and rows (respectively)
- * that they refer to. The displayed contents of cells are the <i>evaluated</i> contents.
+ * that they refer to. The displayed contents of cells are the <i>evaluated</i> contents. The number
+ * of displayed rows and columns will always both be three or greater, regardless of cell
+ * population.
  */
 public class GridWorksheetView implements WorksheetView {
   private final WorksheetModel<?> model;
