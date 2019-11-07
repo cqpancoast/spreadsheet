@@ -17,9 +17,6 @@ import javax.swing.JFrame;
 public class GridWorksheetView extends JFrame implements WorksheetView {
   private final WorksheetModel<?> model;
 
-  private static final int MAX_ROWS = 100;
-  private static final int MAX_COLS = 20;
-
   /**
    * Creates a {@link GridWorksheetView}.
    * @param model a {@link WorksheetModel} representing a worksheet
