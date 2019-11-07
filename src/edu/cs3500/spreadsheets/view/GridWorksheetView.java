@@ -17,8 +17,12 @@ public class GridWorksheetView implements WorksheetView {
   /**
    * Creates a {@link GridWorksheetView}.
    * @param model a {@link WorksheetModel} representing a worksheet
+   * @throws IllegalArgumentException if model is null
    */
   public GridWorksheetView(WorksheetModel<?> model) {
+    if (model == null) {
+      throw new IllegalArgumentException("Model cannot be null.");
+    }
     this.model = model;
   }
 

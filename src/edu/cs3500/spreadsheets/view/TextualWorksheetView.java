@@ -19,8 +19,12 @@ public class TextualWorksheetView implements WorksheetView {
    * Creates a {@link TextualWorksheetView}.
    * @param model a {@link WorksheetModel} representing a worksheet
    * @param appendable the place that this view prints to
+   * @throws IllegalArgumentException if model or appendable is null
    */
   public TextualWorksheetView(WorksheetModel<?> model, Appendable appendable) {
+    if (model == null || appendable == null) {
+      throw new IllegalArgumentException("Model and appendable cannot be null.");
+    }
     this.model = model;
     this.appendable = appendable;
   }
