@@ -7,7 +7,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
-public class CellPanel extends JPanel {
+public class LabelPanel extends JPanel {
+  private final String name;
+
+  LabelPanel(String name) {
+    this.name = name;
+  }
 
   private static final int FONT_SIZE = 18;
   private static final int STRING_X = 15;
@@ -21,12 +26,12 @@ public class CellPanel extends JPanel {
 
     Graphics2D g2d = (Graphics2D)g;
 
-    g2d.setColor(Color.WHITE);
+    g2d.setColor(Color.LIGHT_GRAY);
     g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
     g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
     g2d.setColor(Color.BLACK);
-    g2d.drawString("test", STRING_X, STRING_Y);
+    g2d.drawString(name, STRING_X, STRING_Y);
   }
 
   @Override
