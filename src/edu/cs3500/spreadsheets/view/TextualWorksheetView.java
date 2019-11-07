@@ -3,6 +3,7 @@ package edu.cs3500.spreadsheets.view;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Represents a {@link WorksheetModel} textually, saving this representation to some appendable. The
@@ -36,18 +37,19 @@ public class TextualWorksheetView implements WorksheetView {
 
   @Override
   public String toString() {
+
     StringBuilder viewString = new StringBuilder();
-    int maxCols = model.getMaxColumns();
-    int maxRows = model.getMaxRows();
-    for (int i = 1; i <= maxCols; i++) {
-      for (int j = 1; j <= maxRows; j++) {
-        viewString.append(Coord.colIndexToName(i)).append(j).append(" ");
-        viewString.append(model.getRaw(i, j));
-        if (!(i == maxCols && j == maxRows)) {
-          viewString.append("\n");
-        }
+    Set<Coord> activeCells = this.model.getActiveCells();
+    for (Coord coord : activeCells) {
+      int col = coord.col;
+      int row = coord.row;
+      if (model.getRaw(col, row) != null) {
+        viewString.append(Coord.colIndexToName(col)).append(row).append(" ");
+        viewString.append(model.getRaw(col, row));
+        viewString.append("\n");
       }
     }
-    return viewString.toString();
+
+    return viewString.toString().trim();
   }
 }

@@ -60,7 +60,9 @@ public class BeyondGood {
       }
     } else if (args[2].equals("-save")) {
       try {
-        new TextualWorksheetView(model, new FileWriter(new File(args[3]))).render();
+        FileWriter fileWriter = new FileWriter(new File(args[3]));
+        new TextualWorksheetView(model, fileWriter).render();
+        fileWriter.close();
       } catch (Exception e) {
         System.out.println("Error in saving file, man.");
       }
