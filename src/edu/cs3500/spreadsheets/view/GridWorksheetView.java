@@ -3,6 +3,7 @@ package edu.cs3500.spreadsheets.view;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.awt.GridLayout;
+import java.util.HashMap;
 import javax.swing.JFrame;
 
 /**
@@ -15,7 +16,7 @@ import javax.swing.JFrame;
  * population.
  */
 public class GridWorksheetView extends JFrame implements WorksheetView {
-  private final WorksheetModel<?> model;
+  private HashMap<Integer, HashMap<Integer, CellPanel>> cells;
 
   /**
    * Creates a {@link GridWorksheetView}.
@@ -27,10 +28,19 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     if (model == null) {
       throw new IllegalArgumentException("Model cannot be null.");
     }
-    this.model = model;
 
     final int MAX_ROWS = model.getMaxRows();
     final int MAX_COLS = model.getMaxColumns();
+
+    this.cells = new HashMap<>();
+
+    for (int i = 1; i <= MAX_ROWS; i++) {
+      HashMap<Integer, CellPanel> innerMap = new HashMap<>();
+      for (int j = 1; j <= MAX_COLS; j++) {
+        innerMap.put(j, new CellPanel(model, i, j));
+      }
+      cells.put(i, innerMap);
+    }
 
     this.setLayout(new GridLayout(MAX_ROWS + 1, MAX_COLS + 1));
 
@@ -46,7 +56,7 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
           this.add(new LabelPanel(Integer.toString(i)));
         }
         else {
-          this.add(new CellPanel());
+          this.add(cells.get(i).get(j));
         }
       }
     }
