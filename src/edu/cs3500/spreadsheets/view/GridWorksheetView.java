@@ -29,6 +29,9 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
       throw new IllegalArgumentException("Model cannot be null.");
     }
 
+    this.setTitle("Spreadsheet GUI");
+    this.setVisible(true);
+
     final int MAX_ROWS = model.getMaxRows();
     final int MAX_COLS = model.getMaxColumns();
 

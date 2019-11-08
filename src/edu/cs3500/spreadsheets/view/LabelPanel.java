@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class LabelPanel extends JPanel {
@@ -14,11 +15,12 @@ public class LabelPanel extends JPanel {
     this.name = name;
   }
 
-  private static final int FONT_SIZE = 18;
-  private static final int STRING_X = 15;
-  private static final int STRING_Y = 15;
   private static final int DIMENSION_WIDTH = 100;
-  private static final int DIMENSION_HEIGHT = 20;
+  private static final int DIMENSION_HEIGHT = 25;
+
+  private static final int FONT_SIZE = 14;
+  private static final int STRING_X = DIMENSION_WIDTH / 2 - 5;
+  private static final int STRING_Y = 16;
 
   @Override
   protected void paintComponent(Graphics g) {
@@ -32,6 +34,8 @@ public class LabelPanel extends JPanel {
     g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
     g2d.setColor(Color.BLACK);
     g2d.drawString(name, STRING_X, STRING_Y);
+
+    this.setBorder(BorderFactory.createLineBorder(Color.black));
   }
 
   @Override
