@@ -2,10 +2,16 @@ package edu.cs3500.spreadsheets.view;
 
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.HashMap;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  * Represents a {@link WorksheetModel} visually, as a grid of cells. Although a worksheet is
@@ -20,7 +26,6 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
   private HashMap<Integer, HashMap<Integer, CellPanel>> cells;
   private int maxRows;
   private int maxCols;
-  //private JScrollPane scrollPane;
 
   /**
    * Creates a {@link GridWorksheetView}.
@@ -38,34 +43,61 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
 
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
 
+    // populate the cells field with CellPanels
     this.cells = new HashMap<>();
-
     for (int i = 1; i <= maxRows; i++) {
       HashMap<Integer, CellPanel> innerMap = new HashMap<>();
       for (int j = 1; j <= maxCols; j++) {
-        innerMap.put(j, new CellPanel(model, i, j));
+        // innerMap.put(j, new CellPanel(model, i, j, false)); // UNCOMMENT THIS, DELETE 52-57
+        if (i == 1 && j == 3) {
+          innerMap.put(j, new CellPanel(model, i, j, true));
+        }
+        else {
+          innerMap.put(j, new CellPanel(model, i, j, false));
+        }
       }
       cells.put(i, innerMap);
     }
 
-    this.setLayout(new GridLayout(maxRows + 1, maxCols + 1));
+    this.setLayout(new BorderLayout());
 
-//    scrollPane = new JScrollPane(this);
-//    this.add(scrollPane);
+    // grid panel showing the active cells
+    JPanel grid = new JPanel();
+    grid.setLayout(new GridLayout(maxRows + 1, maxCols + 1));
+    grid.setBorder(BorderFactory.createEmptyBorder(0,15,0,15));
 
+    // button panel to increase number of rows or columns
+    JPanel buttons = new JPanel();
+    buttons.setLayout(new FlowLayout());
+    buttons.add(new JLabel("Adjust grid size:"));
+    buttons.add(new JButton("add rows"));
+    buttons.add(new JButton("add cols"));
+
+    // text field panel to add a new cell (delete if unnecessary)
+    JPanel cellEditor = new JPanel();
+    cellEditor.setLayout(new FlowLayout());
+    cellEditor.add(new JLabel("Add a new cell:"));
+    cellEditor.add(new JTextField(20));
+
+    // add all necessary panels to the frame
+    this.add(grid, BorderLayout.CENTER);
+    this.add(buttons, BorderLayout.PAGE_START);
+    this.add(cellEditor, BorderLayout.PAGE_END);
+
+    // add LabelPanels and CellPanels to the grid
     for (int i = 0; i <= maxRows; i++) {
       for (int j = 0; j <= maxCols; j++) {
         if (i == 0 && j == 0) {
-          this.add(new LabelPanel(""));
+          grid.add(new LabelPanel(""));
         }
         else if (i == 0) {
-          this.add(new LabelPanel(Coord.colIndexToName(j)));
+          grid.add(new LabelPanel(Coord.colIndexToName(j)));
         }
         else if (j == 0) {
-          this.add(new LabelPanel(Integer.toString(i)));
+          grid.add(new LabelPanel(Integer.toString(i)));
         }
         else {
-          this.add(cells.get(i).get(j));
+          grid.add(cells.get(i).get(j));
         }
       }
     }
@@ -78,6 +110,13 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     this.repaint();
   }
 
+  /**
+   * Sets the number of rows and columns in the grid to the given number of rows and columns,
+   * or three: whichever value is greater.
+   *
+   * @param rows  the desired amount of rows
+   * @param cols  the desired amount of columns
+   */
   private void maxRowsCols(int rows, int cols) {
     maxRows = Math.max(3, rows);
     maxCols = Math.max(3, cols);

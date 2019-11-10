@@ -15,7 +15,7 @@ public class LabelPanel extends JPanel {
     this.name = name;
   }
 
-  private static final int DIMENSION_WIDTH = 100;
+  private static final int DIMENSION_WIDTH = 115;
   private static final int DIMENSION_HEIGHT = 25;
 
   private static final int FONT_SIZE = 14;

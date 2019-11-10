@@ -13,14 +13,16 @@ public class CellPanel extends JPanel {
   private final WorksheetModel<?> model;
   private final int row;
   private final int col;
+  private final boolean selected;
 
-  CellPanel(WorksheetModel<?> model, int row, int col) {
+  CellPanel(WorksheetModel<?> model, int row, int col, boolean selected) {
     this.model = model;
     this.row = row;
     this.col = col;
+    this.selected = selected;
   }
 
-  private static final int DIMENSION_WIDTH = 100;
+  private static final int DIMENSION_WIDTH = 115;
   private static final int DIMENSION_HEIGHT = 25;
 
   private static final int FONT_SIZE = 14;
@@ -33,12 +35,14 @@ public class CellPanel extends JPanel {
 
     Graphics2D g2d = (Graphics2D)g;
 
-    g2d.setColor(Color.WHITE);
+    Color cellColor = selected ? Color.ORANGE : Color.WHITE;
+    g2d.setColor(cellColor);
     g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+    String displayed = selected ? model.getRaw(col, row).toString() : model.getEval(col, row);
     g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
     g2d.setColor(Color.BLACK);
-    g2d.drawString(model.getEval(col, row), STRING_X, STRING_Y);
+    g2d.drawString(displayed, STRING_X, STRING_Y);
 
     this.setBorder(BorderFactory.createLineBorder(Color.black));
   }
