@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class CellPanel extends JPanel {
   private final WorksheetModel<?> model;
@@ -27,7 +28,7 @@ public class CellPanel extends JPanel {
 
   private static final int FONT_SIZE = 14;
   private static final int STRING_X = 10;
-  private static final int STRING_Y = 16;
+  private static final int STRING_Y = 17;
 
   @Override
   protected void paintComponent(Graphics g) {
@@ -42,7 +43,16 @@ public class CellPanel extends JPanel {
     String displayed = selected ? model.getRaw(col, row).toString() : model.getEval(col, row);
     g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
     g2d.setColor(Color.BLACK);
-    g2d.drawString(displayed, STRING_X, STRING_Y);
+    if (!selected) {
+      g2d.drawString(displayed, STRING_X, STRING_Y);
+    }
+    if (selected) {
+      JTextField textField = new JTextField(displayed);
+      textField.setBackground(Color.ORANGE);
+      textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+      textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+      this.add(textField);
+    }
 
     this.setBorder(BorderFactory.createLineBorder(Color.black));
   }

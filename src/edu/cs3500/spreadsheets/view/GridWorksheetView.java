@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 /**
  * Represents a {@link WorksheetModel} visually, as a grid of cells. Although a worksheet is
@@ -64,7 +63,7 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     // grid panel showing the active cells
     JPanel grid = new JPanel();
     grid.setLayout(new GridLayout(maxRows + 1, maxCols + 1));
-    grid.setBorder(BorderFactory.createEmptyBorder(0,15,0,15));
+    grid.setBorder(BorderFactory.createEmptyBorder(0,15,15,15));
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
@@ -73,16 +72,9 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     buttons.add(new JButton("add rows"));
     buttons.add(new JButton("add cols"));
 
-    // text field panel to add a new cell (delete if unnecessary)
-    JPanel cellEditor = new JPanel();
-    cellEditor.setLayout(new FlowLayout());
-    cellEditor.add(new JLabel("Add a new cell:"));
-    cellEditor.add(new JTextField(20));
-
     // add all necessary panels to the frame
     this.add(grid, BorderLayout.CENTER);
     this.add(buttons, BorderLayout.PAGE_START);
-    this.add(cellEditor, BorderLayout.PAGE_END);
 
     // add LabelPanels and CellPanels to the grid
     for (int i = 0; i <= maxRows; i++) {

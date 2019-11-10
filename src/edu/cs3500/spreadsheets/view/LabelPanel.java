@@ -20,7 +20,7 @@ public class LabelPanel extends JPanel {
 
   private static final int FONT_SIZE = 14;
   private static final int STRING_X = DIMENSION_WIDTH / 2 - 5;
-  private static final int STRING_Y = 16;
+  private static final int STRING_Y = 17;
 
   @Override
   protected void paintComponent(Graphics g) {
