@@ -5,6 +5,7 @@ import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.awt.GridLayout;
 import java.util.HashMap;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 /**
  * Represents a {@link WorksheetModel} visually, as a grid of cells. Although a worksheet is
@@ -17,6 +18,9 @@ import javax.swing.JFrame;
  */
 public class GridWorksheetView extends JFrame implements WorksheetView {
   private HashMap<Integer, HashMap<Integer, CellPanel>> cells;
+  private int maxRows;
+  private int maxCols;
+  //private JScrollPane scrollPane;
 
   /**
    * Creates a {@link GridWorksheetView}.
@@ -32,23 +36,25 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     this.setTitle("Spreadsheet GUI");
     this.setVisible(true);
 
-    final int MAX_ROWS = model.getMaxRows();
-    final int MAX_COLS = model.getMaxColumns();
+    this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
 
     this.cells = new HashMap<>();
 
-    for (int i = 1; i <= MAX_ROWS; i++) {
+    for (int i = 1; i <= maxRows; i++) {
       HashMap<Integer, CellPanel> innerMap = new HashMap<>();
-      for (int j = 1; j <= MAX_COLS; j++) {
+      for (int j = 1; j <= maxCols; j++) {
         innerMap.put(j, new CellPanel(model, i, j));
       }
       cells.put(i, innerMap);
     }
 
-    this.setLayout(new GridLayout(MAX_ROWS + 1, MAX_COLS + 1));
+    this.setLayout(new GridLayout(maxRows + 1, maxCols + 1));
 
-    for (int i = 0; i <= MAX_ROWS; i++) {
-      for (int j = 0; j <= MAX_COLS; j++) {
+//    scrollPane = new JScrollPane(this);
+//    this.add(scrollPane);
+
+    for (int i = 0; i <= maxRows; i++) {
+      for (int j = 0; j <= maxCols; j++) {
         if (i == 0 && j == 0) {
           this.add(new LabelPanel(""));
         }
@@ -70,5 +76,10 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
   @Override
   public void render() {
     this.repaint();
+  }
+
+  private void maxRowsCols(int rows, int cols) {
+    maxRows = Math.max(3, rows);
+    maxCols = Math.max(3, cols);
   }
 }
