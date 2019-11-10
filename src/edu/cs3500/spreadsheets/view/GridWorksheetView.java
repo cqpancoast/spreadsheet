@@ -47,13 +47,7 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     for (int i = 1; i <= maxRows; i++) {
       HashMap<Integer, CellPanel> innerMap = new HashMap<>();
       for (int j = 1; j <= maxCols; j++) {
-        // innerMap.put(j, new CellPanel(model, i, j, false)); // UNCOMMENT THIS, DELETE 52-57
-        if (i == 1 && j == 3) {
-          innerMap.put(j, new CellPanel(model, i, j, true));
-        }
-        else {
-          innerMap.put(j, new CellPanel(model, i, j, false));
-        }
+        innerMap.put(j, new CellPanel(model, i, j, false));
       }
       cells.put(i, innerMap);
     }
