@@ -41,9 +41,9 @@ public class CellPanel extends JPanel {
     g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
     String displayed = selected ? model.getRaw(col, row).toString() : model.getEval(col, row);
-    g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-    g2d.setColor(Color.BLACK);
     if (!selected) {
+      g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+      g2d.setColor(Color.BLACK);
       g2d.drawString(displayed, STRING_X, STRING_Y);
     }
     if (selected) {
