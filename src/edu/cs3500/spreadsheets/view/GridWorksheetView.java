@@ -3,14 +3,16 @@ package edu.cs3500.spreadsheets.view;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  * Represents a {@link WorksheetModel} visually, as a grid of cells. Although a worksheet is
@@ -39,6 +41,9 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
 
     this.setTitle("Spreadsheet GUI");
     this.setVisible(true);
+    //this.setResizable(false);
+    this.setMinimumSize(new Dimension(490,176));
+    this.setMaximumSize(new Dimension(1290,712));
 
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
 
@@ -56,8 +61,10 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
 
     // grid panel showing the active cells
     JPanel grid = new JPanel();
-    grid.setLayout(new GridLayout(maxRows + 1, maxCols + 1));
+    grid.setLayout(new BoxLayout(grid, BoxLayout.Y_AXIS));
     grid.setBorder(BorderFactory.createEmptyBorder(0,15,15,15));
+    JScrollPane scrollGrid = new JScrollPane(grid);
+    scrollGrid.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
@@ -67,25 +74,28 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     buttons.add(new JButton("add cols"));
 
     // add all necessary panels to the frame
-    this.add(grid, BorderLayout.CENTER);
+    this.add(scrollGrid, BorderLayout.CENTER);
     this.add(buttons, BorderLayout.PAGE_START);
 
     // add LabelPanels and CellPanels to the grid
     for (int i = 0; i <= maxRows; i++) {
+      JPanel row = new JPanel();
+      row.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
       for (int j = 0; j <= maxCols; j++) {
         if (i == 0 && j == 0) {
-          grid.add(new LabelPanel(""));
+          row.add(new LabelPanel(""));
         }
         else if (i == 0) {
-          grid.add(new LabelPanel(Coord.colIndexToName(j)));
+          row.add(new LabelPanel(Coord.colIndexToName(j)));
         }
         else if (j == 0) {
-          grid.add(new LabelPanel(Integer.toString(i)));
+          row.add(new LabelPanel(Integer.toString(i)));
         }
         else {
-          grid.add(cells.get(i).get(j));
+          row.add(cells.get(i).get(j));
         }
       }
+      grid.add(row);
     }
 
     this.pack();
