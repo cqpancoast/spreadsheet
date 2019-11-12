@@ -40,6 +40,7 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
 
     this.setTitle("Spreadsheet GUI");
     this.setVisible(true);
+    //this.setResizable(false);
 
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
 
@@ -56,14 +57,16 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     this.setLayout(new BorderLayout());
 
     // grid panel showing the active cells
-    Dimension gridDimension = new Dimension(Math.min(115 * (maxCols + 2), 1100), Math.min(27 * (maxRows + 1), 500));
+
+    Dimension gridDimension = new Dimension(
+        Math.min(115 * (maxCols + 2), 1100), Math.min(28 * (maxRows + 1), 600));
     JPanel grid = new JPanel();
     grid.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
     grid.setBorder(BorderFactory.createEmptyBorder(0,15,15,15));
-    grid.setPreferredSize(gridDimension);
+    grid.setPreferredSize(new Dimension(115 * (maxCols + 2), 27 * (maxRows + 1)));
     JScrollPane scrollGrid = new JScrollPane(grid);
-    scrollGrid.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-    scrollGrid.setSize(gridDimension);
+    scrollGrid.setBorder(BorderFactory.createEmptyBorder());
+    scrollGrid.setPreferredSize(gridDimension);
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
