@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,9 +19,8 @@ import javax.swing.JScrollPane;
  * than the cell with the largest row and column. Bars are put at the top and the left of the view
  * that have A, B, C... and 1, 2, 3... spaced to be in line with the columns and rows (respectively)
  * that they refer to. The displayed contents of cells are the <i>evaluated</i> contents. The number
- * of displayed rows and columns will be determined by maxRows and maxColumns of the model, but will
- * never be smaller than a 3 x 3 grid. At any given time, either one or zero cells can be "active".
- * If a cell is active, it will have a blue border and will display the raw contents of the cell.
+ * of displayed rows and columns will always both be three or greater, regardless of cell
+ * population.
  */
 public class GridWorksheetView extends JFrame implements WorksheetView {
   private HashMap<Integer, HashMap<Integer, CellPanel>> cells;
@@ -42,9 +40,6 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
 
     this.setTitle("Spreadsheet GUI");
     this.setVisible(true);
-    //this.setResizable(false);
-    this.setMinimumSize(new Dimension(490,176));
-    this.setMaximumSize(new Dimension(1290,712));
 
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
 
@@ -61,11 +56,14 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     this.setLayout(new BorderLayout());
 
     // grid panel showing the active cells
+    Dimension gridDimension = new Dimension(Math.min(115 * (maxCols + 2), 1100), Math.min(27 * (maxRows + 1), 500));
     JPanel grid = new JPanel();
-    grid.setLayout(new BoxLayout(grid, BoxLayout.Y_AXIS));
+    grid.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
     grid.setBorder(BorderFactory.createEmptyBorder(0,15,15,15));
+    grid.setPreferredSize(gridDimension);
     JScrollPane scrollGrid = new JScrollPane(grid);
     scrollGrid.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+    scrollGrid.setSize(gridDimension);
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
