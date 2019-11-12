@@ -1,4 +1,4 @@
-import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
@@ -46,7 +46,9 @@ public class TextualWorksheetViewTest {
     Set<String> renderFileLines
         = new HashSet<String>(Arrays.asList(renderFile.toString().split("\n")));
 
-    assertEquals(readFileLines, renderFileLines);
+    // Contains is used instead of checking equality because of the case where cells are written to
+    // multiple times in the read file.
+    assertTrue(readFileLines.containsAll(renderFileLines));
   }
 
   //NOTE delete if necessary
@@ -59,7 +61,7 @@ public class TextualWorksheetViewTest {
   }
 
   // As render calls toString directly, all tests for toString are left out.
-  // NOTE: this may change in the future if render ends up doing anything other than toString
+  //NOTE: this may change in the future if render ends up doing anything other than toString
 
   /** Tests for {@link TextualWorksheetView#render()}. */
 
@@ -68,9 +70,8 @@ public class TextualWorksheetViewTest {
     renderTextHarness("");
   }
 
-
   @Test
-  public void render_noErrorsBasicCalls() { //HELP is this ok or should I go with the below?
+  public void render_noErrorsBasicCalls() {
     renderTextHarnessFromPath("buildFiles/noErrorsBasicCalls.gOOD");
   }
 
@@ -82,6 +83,11 @@ public class TextualWorksheetViewTest {
   @Test
   public void render_errorsInCalls() {
     renderTextHarnessFromPath("buildFiles/errorsInCalls.gOOD");
+  }
+
+  @Test
+  public void render_overwrittenCalls() {
+    renderTextHarnessFromPath("buildFiles/noErrorsBasicCallsWithOverwrites.gOOD");
   }
 
 }

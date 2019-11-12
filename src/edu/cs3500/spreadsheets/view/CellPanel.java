@@ -10,12 +10,22 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * A visual representation of a cell in a spreadsheet; an element of a {@link GridWorksheetView}.
+ * [More to be put here when controller is added.]
+ */
 public class CellPanel extends JPanel {
   private final WorksheetModel<?> model;
   private final int row;
   private final int col;
   private final boolean selected;
 
+  /**
+   * Constructs a {@link CellPanel}.
+   * @param model THIS WON'T BE A PARAM FOR LONG
+   * @param row the row of this cell in the grid
+   * @param col the column of this cell in the grid
+   */
   CellPanel(WorksheetModel<?> model, int row, int col, boolean selected) {
     this.model = model;
     this.row = row;

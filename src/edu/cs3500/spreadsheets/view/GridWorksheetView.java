@@ -20,8 +20,9 @@ import javax.swing.JScrollPane;
  * than the cell with the largest row and column. Bars are put at the top and the left of the view
  * that have A, B, C... and 1, 2, 3... spaced to be in line with the columns and rows (respectively)
  * that they refer to. The displayed contents of cells are the <i>evaluated</i> contents. The number
- * of displayed rows and columns will always both be three or greater, regardless of cell
- * population.
+ * of displayed rows and columns will be determined by maxRows and maxColumns of the model, but will
+ * never be smaller than a 3 x 3 grid. At any given time, either one or zero cells can be "active".
+ * If a cell is active, it will have a blue border and will display the raw contents of the cell.
  */
 public class GridWorksheetView extends JFrame implements WorksheetView {
   private HashMap<Integer, HashMap<Integer, CellPanel>> cells;

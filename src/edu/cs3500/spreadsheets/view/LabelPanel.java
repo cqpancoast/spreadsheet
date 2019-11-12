@@ -7,10 +7,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import edu.cs3500.spreadsheets.model.Coord;
 
+/**
+ * A {@link JPanel} to label columns and rows in a {@link GridWorksheetView} according to the
+ * indexing prescription of {@link Coord}.
+ */
 public class LabelPanel extends JPanel {
   private final String name;
 
+  /**
+   * Creates a {@link LabelPanel}.
+   * @param name the name that this will display
+   */
   LabelPanel(String name) {
     this.name = name;
   }
