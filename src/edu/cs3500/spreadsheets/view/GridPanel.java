@@ -39,16 +39,17 @@ public class GridPanel extends JPanel {
     for (int i = 0; i <= maxCols; i++) {
       for (int j = 0; j <= maxRows; j++) {
         if (i == 0 && j == 0) {
-          drawCell(g2d, 0, 0, Color.LIGHT_GRAY, "");
+          drawCell(g2d, 15, 0, Color.LIGHT_GRAY, "");
         }
         else if (i == 0) {
-          drawCell(g2d, 0, j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
+          drawCell(g2d, 15, j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
         }
         else if (j == 0) {
-          drawCell(g2d, i * CELL_WIDTH, 0, Color.LIGHT_GRAY, Coord.colIndexToName(i));
+          drawCell(g2d,  15 + i * CELL_WIDTH, 0, Color.LIGHT_GRAY, Coord.colIndexToName(i));
         }
         else {
-          drawCell(g2d, i * CELL_WIDTH, j * CELL_HEIGHT, Color.WHITE, model.getEval(i, j));
+          drawCell(
+              g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.WHITE, model.getEval(i, j));
         }
       }
     }
@@ -57,7 +58,7 @@ public class GridPanel extends JPanel {
   @Override
   public Dimension getPreferredSize() {
     return new Dimension(
-        (maxCols + 1) * CELL_WIDTH + 15, (maxRows + 1) * CELL_HEIGHT + 15);
+        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 15);
   }
 
   /**
