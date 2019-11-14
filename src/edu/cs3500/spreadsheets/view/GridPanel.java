@@ -8,9 +8,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class GridPanel extends JPanel {
   private final WorksheetModel<?> model;
+  private int selectedCol;
+  private int selectedRow;
   private int maxRows;
   private int maxCols;
 
@@ -19,15 +22,16 @@ public class GridPanel extends JPanel {
    * @param model the {@link WorksheetModel} used to build the grid
 
    */
-  GridPanel(WorksheetModel<?> model) {
+  GridPanel(WorksheetModel<?> model, int selectedCol, int selectedRow) {
     this.model = model;
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
+    this.selectedCol = selectedCol;
+    this.selectedRow = selectedRow;
+    this.setLayout(null);
   }
-
 
   private static final int CELL_WIDTH = 115;
   private static final int CELL_HEIGHT = 25;
-
   private static final int FONT_SIZE = 14;
 
   @Override
@@ -48,8 +52,21 @@ public class GridPanel extends JPanel {
           drawCell(g2d,  15 + i * CELL_WIDTH, 0, Color.LIGHT_GRAY, Coord.colIndexToName(i));
         }
         else {
-          drawCell(
-              g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.WHITE, model.getEval(i, j));
+          if (selectedCol == i && selectedRow == j) {
+            drawCell(
+                g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.ORANGE, "");
+            JTextField textField = new JTextField(model.getRaw(i, j).toString());
+            textField.setBackground(Color.ORANGE);
+            textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+            textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+            this.add(textField);
+            textField.setSize(CELL_WIDTH, CELL_HEIGHT);
+            textField.setLocation(15 + i * CELL_WIDTH, j * CELL_HEIGHT);
+          }
+          else {
+            drawCell(
+                g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.WHITE, model.getEval(i, j));
+          }
         }
       }
     }

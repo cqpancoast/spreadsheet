@@ -38,7 +38,7 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     //this.setResizable(false);
 
     // grid panel showing the active cells
-    JPanel grid = new GridPanel(model);
+    JPanel grid = new GridPanel(model, 0, 0);
     Dimension gridSize = grid.getPreferredSize();
     JScrollPane scrollGrid = new JScrollPane(grid);
     scrollGrid.setBorder(BorderFactory.createEmptyBorder());
