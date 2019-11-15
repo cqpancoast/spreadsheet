@@ -43,4 +43,17 @@ the class is `SexpEvaluatorLessThan`)) implements `SEFW` directly.
 
 ## The View
 
+The interface for the view is `WorksheetView`. It's purpose is to visually represent a
+`WorksheetModel` as a 2-D grid of cells. It's sole method `render()` processes the data of the
+ model and displays it in a human-readable manner. The two implementing classes of the view are
+`TextualWorksheetView` and `GridWorksheetView`.
+
+`TextualWorksheetView` textually renders the grid by appending it to an appendable in the same
+ format that the data is read in from files (cell name followed by its raw contents).
+
+`GridWorksheetView` uses Java Swing to render the grid via graphics. The frame contains a panel of
+ two buttons, to be used to increase the grid size, and a `GridPanel` containing the cells of the
+ grid. The `GridPanel` draws cell labels along the top and left sides, and the evaluated contents
+ of each cell in their properly corresponding cells in the grid.
+
 ## The Controller

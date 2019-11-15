@@ -18,7 +18,7 @@ public class GridPanel extends JPanel {
   private int maxCols;
 
   /**
-   * Constructs a {@link CellPanel}.
+   * Constructs a {@link GridPanel}.
    * @param model the {@link WorksheetModel} used to build the grid
 
    */
