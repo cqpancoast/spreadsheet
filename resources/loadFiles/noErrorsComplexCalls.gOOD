@@ -1,0 +1,21 @@
+A1 0
+A2 "string"
+A3 true
+A4 -4.9
+A5 "true"
+B1 2.1
+B2 "yeet"
+B3 false
+B4 8.76
+B5 "false"
+C1 =(SUM 2.1 "whoops" 7.43 false)
+C2 =(SUM)
+C3 =(SUM A1:B4)
+C4 =(SUM A6 4.1)
+C5 =(PRODUCT 8.3 true "bees" -1.0)
+C6 =(PRODUCT)
+C7 =(PRODUCT A1:B4)
+C8 =(PRODUCT A6 4.1)
+C9 =(< (SUM 3 1) 5
+C10 =(ENUM A1:B5)
+C11 =(ENUM A6 "wahoo")
