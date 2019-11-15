@@ -2,10 +2,10 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.fail;
 
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
-import edu.cs3500.spreadsheets.model.WorksheetModel;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
-import edu.cs3500.spreadsheets.view.WorksheetView;
+import edu.cs3500.spreadsheets.view.IWorksheetView;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -29,7 +29,7 @@ public class TextualWorksheetViewTest {
    */
   private void renderTextHarness(String readFileContents) {
 
-    WorksheetModel<String> model;
+    IWorksheetModel<String> model;
     try {
       model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
           new StringReader(readFileContents));
@@ -39,7 +39,7 @@ public class TextualWorksheetViewTest {
     }
 
     Appendable renderFile = new StringBuilder();
-    WorksheetView view = new TextualWorksheetView(model, renderFile);
+    IWorksheetView view = new TextualWorksheetView(model, renderFile);
     view.render();
 
     Set<String> readFileLines

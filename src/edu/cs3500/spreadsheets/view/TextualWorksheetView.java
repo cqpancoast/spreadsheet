@@ -1,27 +1,27 @@
 package edu.cs3500.spreadsheets.view;
 
 import edu.cs3500.spreadsheets.model.Coord;
-import edu.cs3500.spreadsheets.model.WorksheetModel;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.io.IOException;
 import java.util.Set;
 
 /**
- * Represents a {@link WorksheetModel} textually, saving this representation to some appendable. The
+ * Represents a {@link IWorksheetModel} textually, saving this representation to some appendable. The
  * representation is an unordered set of cell-value pairs, with the scheme "[cell] [value]" for each
  * line in the file. The cell is the string representation of a cells position in the grid according
  * to the convention in {@link Coord}, while value is the <i>unevaluated</i> contents of that cell.
  */
-public class TextualWorksheetView implements WorksheetView {
-  private final WorksheetModel<?> model;
+public class TextualWorksheetView implements IWorksheetView {
+  private final IWorksheetModel<?> model;
   private final Appendable appendable;
 
   /**
    * Creates a {@link TextualWorksheetView}.
-   * @param model a {@link WorksheetModel} representing a worksheet
+   * @param model a {@link IWorksheetModel} representing a worksheet
    * @param appendable the place that this view prints to
    * @throws IllegalArgumentException if model or appendable is null
    */
-  public TextualWorksheetView(WorksheetModel<?> model, Appendable appendable) {
+  public TextualWorksheetView(IWorksheetModel<?> model, Appendable appendable) {
     if (model == null || appendable == null) {
       throw new IllegalArgumentException("Model and appendable cannot be null.");
     }
