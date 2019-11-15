@@ -15,22 +15,19 @@ import javax.swing.JTextField;
  */
 public class GridPanel extends JPanel {
   private final WorksheetModel<?> model;
-  private int selectedCol;
-  private int selectedRow;
+  private Coord selected;
   private int maxRows;
   private int maxCols;
 
   /**
    * Constructs a {@link GridPanel}.
    * @param model the {@link WorksheetModel} used to build the grid
-   * @param selectedCol here for testing purposes before controller; selected column
-   * @param selectedRow here for testing purposes before controller; selected row
+   * @param selected coordinates of selected cell
    */
-  GridPanel(WorksheetModel<?> model, int selectedCol, int selectedRow) {
+  GridPanel(WorksheetModel<?> model, Coord selected) {
     this.model = model;
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
-    this.selectedCol = selectedCol;
-    this.selectedRow = selectedRow;
+    this.selected = selected;
     this.setLayout(null);
   }
 
@@ -47,29 +44,29 @@ public class GridPanel extends JPanel {
     for (int i = 0; i <= maxCols; i++) {
       for (int j = 0; j <= maxRows; j++) {
         if (i == 0 && j == 0) {
-          drawCell(g2d, 15, 0, Color.LIGHT_GRAY, "");
+          drawCell(g2d, 15, 15, Color.LIGHT_GRAY, "");
         }
         else if (i == 0) {
-          drawCell(g2d, 15, j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
+          drawCell(g2d, 15, 15 + j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
         }
         else if (j == 0) {
-          drawCell(g2d,  15 + i * CELL_WIDTH, 0, Color.LIGHT_GRAY, Coord.colIndexToName(i));
+          drawCell(g2d,  15 + i * CELL_WIDTH, 15, Color.LIGHT_GRAY, Coord.colIndexToName(i));
         }
         else {
-          if (selectedCol == i && selectedRow == j) {
+          if (selected != null && selected.col == i && selected.row == j) {
             drawCell(
-                g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.ORANGE, "");
+                g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
             JTextField textField = new JTextField(model.getRaw(i, j).toString());
             textField.setBackground(Color.ORANGE);
             textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
             textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
             this.add(textField);
             textField.setSize(CELL_WIDTH, CELL_HEIGHT);
-            textField.setLocation(15 + i * CELL_WIDTH, j * CELL_HEIGHT);
+            textField.setLocation(15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT);
           }
           else {
-            drawCell(
-                g2d, 15 + i * CELL_WIDTH, j * CELL_HEIGHT, Color.WHITE, model.getEval(i, j));
+            drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
+                Color.WHITE, model.getEval(i, j));
           }
         }
       }
@@ -79,7 +76,7 @@ public class GridPanel extends JPanel {
   @Override
   public Dimension getPreferredSize() {
     return new Dimension(
-        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 15);
+        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 30);
   }
 
   /**

@@ -4,8 +4,11 @@ import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -18,14 +21,14 @@ import javax.swing.JScrollPane;
  * of displayed rows and columns will always both be three or greater, regardless of cell
  * population.
  */
-public class GridWorksheetView extends JFrame implements WorksheetView {
+public class EditableGridWorksheetView extends JFrame implements WorksheetView {
 
   /**
-   * Creates a {@link GridWorksheetView}.
+   * Creates a {@link EditableGridWorksheetView}.
    * @param model a {@link WorksheetModel} representing a worksheet
    * @throws IllegalArgumentException if model is null
    */
-  public GridWorksheetView(WorksheetModel<?> model) {
+  public EditableGridWorksheetView(WorksheetModel<?> model) {
     super();
     if (model == null) {
       throw new IllegalArgumentException("Model cannot be null.");
@@ -42,9 +45,17 @@ public class GridWorksheetView extends JFrame implements WorksheetView {
     scrollGrid.setPreferredSize(
         new Dimension(Math.min(gridSize.width, 1100), Math.min(gridSize.height, 600)));
 
+    // button panel to increase number of rows or columns
+    JPanel buttons = new JPanel();
+    buttons.setLayout(new FlowLayout());
+    buttons.add(new JLabel("Adjust grid size:"));
+    buttons.add(new JButton("add row"));
+    buttons.add(new JButton("add column"));
+
     // add all necessary panels to the frame
     this.setLayout(new BorderLayout());
     this.add(scrollGrid, BorderLayout.CENTER);
+    this.add(buttons, BorderLayout.PAGE_START);
 
     this.pack();
   }

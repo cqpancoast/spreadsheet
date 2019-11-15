@@ -5,6 +5,7 @@ import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.SexpEvaluator;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
+import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
 import edu.cs3500.spreadsheets.view.GridWorksheetView;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
 import java.io.BufferedReader;
@@ -54,6 +55,7 @@ public class BeyondGood {
     // Display the correct thing given the model
     if (args[2].equals("-eval")) {
       try {
+        assert model != null;
         evaluateCellInWorksheet(model, args[3]);
       } catch (Exception e) {
         System.out.println("Error in cell evaluation, man.");
@@ -72,8 +74,14 @@ public class BeyondGood {
       } catch (Exception e) {
         System.out.println("Error in displaying grid, man.");
       }
+    } else if (args[2].equals("-edit") || args[0].equals("-edit")) {
+      try {
+        new EditableGridWorksheetView(model).render();
+      } catch (Exception e) {
+        System.out.println(e.getMessage());
+        System.out.println("Error in displaying editable grid, man.");
+      }
     }
-
   }
 
   /**
@@ -82,12 +90,14 @@ public class BeyondGood {
    * - -in [some-filename] -save [some-new-filename]
    * - -in [some-filename] -gui
    * - -gui
+   * -in [some-filename] -edit
+   * -edit
    * Does not check for validity of file name, but does check for validity of cell name.
    * @param args main args
    * @return whether args follow the correct format
    */
   private static boolean wellFormedCommand(String[] args) {
-    if (args[0].equals("-gui")) {
+    if (args[0].equals("-gui") || args[0].equals("-edit")) {
       return args.length == 1;
     } else if (args[0].equals("-in")) {
       if (args.length == 4) {
@@ -97,7 +107,7 @@ public class BeyondGood {
           return true;
         }
       } else if (args.length == 3) {
-        return args[2].equals("-gui");
+        return args[2].equals("-gui") || args[2].equals("-edit");
       }
     }
     return false;
@@ -132,5 +142,4 @@ public class BeyondGood {
       }
     }
   }
-
 }
