@@ -1,7 +1,7 @@
 package edu.cs3500.spreadsheets.view;
 
 import edu.cs3500.spreadsheets.model.Coord;
-import edu.cs3500.spreadsheets.model.WorksheetModel;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,17 +14,17 @@ import javax.swing.JTextField;
  * The panel that holds the grid in a {@link GridWorksheetView}.
  */
 public class GridPanel extends JPanel {
-  private final WorksheetModel<?> model;
+  private final IWorksheetModel<?> model;
   private Coord selected;
   private int maxRows;
   private int maxCols;
 
   /**
    * Constructs a {@link GridPanel}.
-   * @param model the {@link WorksheetModel} used to build the grid
+   * @param model the {@link IWorksheetModel} used to build the grid
    * @param selected coordinates of selected cell
    */
-  GridPanel(WorksheetModel<?> model, Coord selected) {
+  GridPanel(IWorksheetModel<?> model, Coord selected) {
     this.model = model;
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
