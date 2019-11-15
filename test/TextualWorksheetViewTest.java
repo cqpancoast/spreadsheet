@@ -1,4 +1,5 @@
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.fail;
 
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetModel;
@@ -51,12 +52,16 @@ public class TextualWorksheetViewTest {
     assertTrue(readFileLines.containsAll(renderFileLines));
   }
 
-  //NOTE delete if necessary
+  /**
+   * Takes in a string, finds the file, and puts that string into
+   * {@link TextualWorksheetViewTest#renderTextHarness(String)}.
+   * @param filePath  a file path represented as a string
+   */
   private void renderTextHarnessFromPath(String filePath) {
     try {
       this.renderTextHarness(Files.readString(new File(filePath).toPath()));
     } catch (IOException e) {
-      e.printStackTrace();
+      fail();
     }
   }
 

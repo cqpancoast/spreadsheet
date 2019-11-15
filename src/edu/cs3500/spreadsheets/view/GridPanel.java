@@ -10,6 +10,9 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * The panel that holds the grid in a {@link GridWorksheetView}.
+ */
 public class GridPanel extends JPanel {
   private final WorksheetModel<?> model;
   private int selectedCol;
@@ -20,7 +23,8 @@ public class GridPanel extends JPanel {
   /**
    * Constructs a {@link GridPanel}.
    * @param model the {@link WorksheetModel} used to build the grid
-
+   * @param selectedCol here for testing purposes before controller; selected column
+   * @param selectedRow here for testing purposes before controller; selected row
    */
   GridPanel(WorksheetModel<?> model, int selectedCol, int selectedRow) {
     this.model = model;
