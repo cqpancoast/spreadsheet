@@ -3,7 +3,7 @@ import static junit.framework.TestCase.assertNull;
 
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
-import edu.cs3500.spreadsheets.model.WorksheetModel;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.model.SExpEvaluatorFormulaWorksheet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class FormulaWorksheetModelTest {
 
-  private WorksheetModel<String> model;
+  private IWorksheetModel<String> model;
   private static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   private static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   private static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";

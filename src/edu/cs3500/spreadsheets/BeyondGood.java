@@ -3,7 +3,7 @@ package edu.cs3500.spreadsheets;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.SexpEvaluator;
-import edu.cs3500.spreadsheets.model.WorksheetModel;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
 import edu.cs3500.spreadsheets.view.GridWorksheetView;
@@ -33,7 +33,7 @@ public class BeyondGood {
     }
 
     // Create the model from the file, if one is provided
-    WorksheetModel<?> model = null;
+    IWorksheetModel<?> model = null;
     if (args[0].equals("-gui")) {
       try {
         model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
@@ -117,11 +117,11 @@ public class BeyondGood {
    * Evaluates a cell in the worksheet and prints the result if there are no errors within the
    * worksheet. If there are errors in a worksheet, don't evaluate the cell, but rather print
    * messages of the form "Error in cell Z42: ..." for every errored cell in the model.
-   * @param model a {@link WorksheetModel}
+   * @param model a {@link IWorksheetModel}
    * @param evalCellName a string representation of the cell to evaluate's position in the
    *                     worksheet grid
    */
-  private static void evaluateCellInWorksheet(WorksheetModel<?> model, String evalCellName) {
+  private static void evaluateCellInWorksheet(IWorksheetModel<?> model, String evalCellName) {
     List<Integer> evalCellPosn = Coord.fromString(evalCellName);
     Coord evalCellCoord = new Coord(evalCellPosn.get(0), evalCellPosn.get(1));
     boolean errorInWorksheet = false;

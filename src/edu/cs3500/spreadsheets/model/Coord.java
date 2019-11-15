@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A value type representing coordinates in a {@link WorksheetModel}.
+ * A value type representing coordinates in a {@link IWorksheetModel}.
  */
 public class Coord {
   public final int row;
