@@ -1,5 +1,6 @@
 package edu.cs3500.spreadsheets.view;
 
+import edu.cs3500.spreadsheets.controller.WorksheetController.FeatureListener;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.io.IOException;
@@ -37,6 +38,26 @@ public class TextualWorksheetView implements IWorksheetView {
       throw new IllegalStateException("TextualWorksheetView's appendable object "
           + "cannot append string.");
     }
+  }
+
+  @Override
+  public void setActiveCell(Coord coord) {
+
+  }
+
+  @Override
+  public Coord getActiveCell() {
+    return null;
+  }
+
+  @Override
+  public String getInputFromActiveCell() {
+    return null;
+  }
+
+  @Override
+  public void addFeatureListener(FeatureListener f) {
+
   }
 
   @Override
