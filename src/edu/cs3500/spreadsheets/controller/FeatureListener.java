@@ -21,6 +21,21 @@ public interface FeatureListener {
    */
   void onCellDeselection();
 
+  /**
+   * Updates the contents of a cell in the model.
+   * @param c  a cell's coordinate in the grid
+   * @param s  the new contents of the cell
+   */
+  void onCellContentsUpdate(Coord c, String s);
 
+  /**
+   * Saves the current version of the model.
+   */
+  void save();
+
+  /**
+   * Quits the program.
+   */
+  void quit();
 
 }

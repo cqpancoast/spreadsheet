@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class FormulaWorksheetModelTest {
 
-  private IWorksheetModel<String> model;
+  private IWorksheetModel model;
   private static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
   private static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   private static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";

@@ -9,23 +9,18 @@ import edu.cs3500.spreadsheets.view.IWorksheetView;
  * model and view implementations.
  */
 public class WorksheetController implements IWorksheetController, FeatureListener {
-  private final IWorksheetModel<?> model;
+  private final IWorksheetModel model;
   private IWorksheetView view;
 
   /**
    * Creates a {@link WorksheetController}.
    * @param model  a spreadsheet model
    */
-  public WorksheetController(IWorksheetModel<?> model) {
+  public WorksheetController(IWorksheetModel model) {
     if (model == null) {
       throw new IllegalArgumentException("Received null model");
     }
     this.model = model;
-  }
-
-  @Override
-  public void go() {
-
   }
 
   @Override
@@ -35,12 +30,32 @@ public class WorksheetController implements IWorksheetController, FeatureListene
   }
 
   @Override
-  public void onCellSelection(Coord c) {
+  public void go() {
 
   }
 
   @Override
-  public void onCellDeselection() {
+  public void onCellSelection(Coord c) {
+    view.setActiveCell(c);
+  }
 
+  @Override
+  public void onCellDeselection() {
+    view.setActiveCell(null);
+  }
+
+  @Override
+  public void onCellContentsUpdate(Coord c, String s) {
+    model.set(c.col, c.row, s);
+  }
+
+  @Override
+  public void save() {
+
+  }
+
+  @Override
+  public void quit() {
+    System.exit(0);
   }
 }

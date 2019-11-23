@@ -34,7 +34,7 @@ import java.util.Set;
  * Cells with contents deviating from the above prescription are invalid. Cells referencing invalid
  * cells are also invalid.
  */
-public class FormulaWorksheetModel implements IWorksheetModel<String> {
+public class FormulaWorksheetModel implements IWorksheetModel {
 
   private final HashMap<Coord, String> worksheet;
   private final SexpEvaluator<String> evaluator = new SExpEvaluatorFormulaWorksheet(this);

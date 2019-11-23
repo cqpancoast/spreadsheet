@@ -33,7 +33,7 @@ public class BeyondGood {
     }
 
     // Create the model from the file, if one is provided
-    IWorksheetModel<?> model = null;
+    IWorksheetModel model = null;
     if (args[0].equals("-gui")) {
       try {
         model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
@@ -121,7 +121,7 @@ public class BeyondGood {
    * @param evalCellName a string representation of the cell to evaluate's position in the
    *                     worksheet grid
    */
-  private static void evaluateCellInWorksheet(IWorksheetModel<?> model, String evalCellName) {
+  private static void evaluateCellInWorksheet(IWorksheetModel model, String evalCellName) {
     List<Integer> evalCellPosn = Coord.fromString(evalCellName);
     Coord evalCellCoord = new Coord(evalCellPosn.get(0), evalCellPosn.get(1));
     boolean errorInWorksheet = false;

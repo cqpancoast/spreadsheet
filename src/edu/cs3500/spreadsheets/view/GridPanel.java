@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -14,7 +15,7 @@ import javax.swing.JTextField;
  * The panel that holds the grid in a {@link GridWorksheetView}.
  */
 public class GridPanel extends JPanel {
-  private final IWorksheetModel<?> model;
+  private final IWorksheetModel model;
   private Coord selected;
   private int maxRows;
   private int maxCols;
@@ -24,7 +25,7 @@ public class GridPanel extends JPanel {
    * @param model the {@link IWorksheetModel} used to build the grid
    * @param selected coordinates of selected cell
    */
-  GridPanel(IWorksheetModel<?> model, Coord selected) {
+  GridPanel(IWorksheetModel model, Coord selected) {
     this.model = model;
     this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
@@ -108,8 +109,12 @@ public class GridPanel extends JPanel {
    * @param rows  the desired amount of rows
    * @param cols  the desired amount of columns
    */
-  private void maxRowsCols(int rows, int cols) {
+  public void maxRowsCols(int rows, int cols) {
     maxRows = Math.max(3, rows);
     maxCols = Math.max(3, cols);
+  }
+
+  public Coord pixelToCoord(Point p) {
+    return null; //TODO
   }
 }

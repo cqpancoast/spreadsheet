@@ -17,7 +17,7 @@ public class WorksheetControllerTest {
    * @param model  any spreadsheet model
    * @param view  any spreadsheet view
    */
-  private void initController(IWorksheetModel<?> model, IWorksheetView view) {
+  private void initController(IWorksheetModel model, IWorksheetView view) {
     controller = new WorksheetController(model);
     controller.setView(view);
   }

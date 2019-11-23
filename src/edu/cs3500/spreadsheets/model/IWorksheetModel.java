@@ -4,13 +4,12 @@ import java.util.Set;
 
 /**
  * Represents a worksheet in a spreadsheet application, in which there is a potentially infinite
- * grid with values. "Raw" values can be of any type, given by type param T. This interface supports
- * the idea of evaluation, that is, that by some process the evaluated contents of a cell will be
- * different from its raw contents. For ease of display, the evaluated contents are always Strings.
- * Raw values of cells without any values in them will always be null.
- * @param <T> type of raw cell contents
+ * grid with values. This interface supports the idea of evaluation, that is, that by some process
+ * the evaluated contents of a cell will be different from its raw contents. For ease of display,
+ * the evaluated contents are always Strings. Raw values of cells are strings, and the raw values of
+ * cells without any values in them will always be null.
  */
-public interface IWorksheetModel<T> {
+public interface IWorksheetModel {
 
   /**
    * Sets the cell at coordinate c in the grid to have the value val.
@@ -18,7 +17,7 @@ public interface IWorksheetModel<T> {
    * @param row row in the grid
    * @param val an unevaluated value
    */
-  void set(int col, int row, T val);
+  void set(int col, int row, String val);
 
   /**
    * Gets the evaluated contents of the cell at coordinate c in the grid.
@@ -34,7 +33,7 @@ public interface IWorksheetModel<T> {
    * @param row row in the grid
    * @return unevaluated contents of cell at coord c
    */
-  T getRaw(int col, int row);
+  String getRaw(int col, int row);
 
   /**
    * Returns the row number of the valued cell with the largest row coordinate.

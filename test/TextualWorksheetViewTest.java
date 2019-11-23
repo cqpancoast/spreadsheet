@@ -29,7 +29,7 @@ public class TextualWorksheetViewTest {
    */
   private void renderTextHarness(String readFileContents) {
 
-    IWorksheetModel<String> model;
+    IWorksheetModel model;
     try {
       model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
           new StringReader(readFileContents));
