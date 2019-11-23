@@ -1,15 +1,46 @@
 package edu.cs3500.spreadsheets.controller;
 
+import edu.cs3500.spreadsheets.model.Coord;
+import edu.cs3500.spreadsheets.model.IWorksheetModel;
+import edu.cs3500.spreadsheets.view.IWorksheetView;
+
 /**
- * TODO
+ * A concrete implementation of a {@link IWorksheetController} that works for all combinations of
+ * model and view implementations.
  */
-public class WorksheetController {
+public class WorksheetController implements IWorksheetController, FeatureListener {
+  private final IWorksheetModel<?> model;
+  private IWorksheetView view;
 
   /**
-   * TODO
+   * Creates a {@link WorksheetController}.
+   * @param model  a spreadsheet model
    */
-  public interface FeatureListener {
+  public WorksheetController(IWorksheetModel<?> model) {
+    if (model == null) {
+      throw new IllegalArgumentException("Received null model");
+    }
+    this.model = model;
+  }
+
+  @Override
+  public void go() {
 
   }
 
+  @Override
+  public void setView(IWorksheetView view) {
+    this.view = view;
+    this.view.addFeatureListener(this);
+  }
+
+  @Override
+  public void onCellSelection(Coord c) {
+
+  }
+
+  @Override
+  public void onCellDeselection() {
+
+  }
 }
