@@ -136,7 +136,9 @@ public class GridPanel extends JPanel {
    * @param p  the x and y position of the mouse click in pixels
    */
   Coord pixelToCoord(Point p) {
-    return new Coord((int)p.getX() / 115, (int)p.getY() / 25);
+    int col = (int)p.getX() / CELL_WIDTH;
+    int row = (int)p.getY() / CELL_HEIGHT;
+    return col <= 1 || row <= 1 ? null : new Coord(col, row);
   }
 
   /**
@@ -153,5 +155,17 @@ public class GridPanel extends JPanel {
    **/
   Coord getActiveCell() {
     return new Coord(selected.col, selected.row);
+  }
+
+  /**
+   * Sets the contents of the currently selected cell.
+   *
+   * @param contents  the contents to be set
+   *
+   */
+  void setActiveContents(String contents) {
+    if (selected != null) {
+      this.model.set(selected.col, selected.row, contents);
+    }
   }
 }

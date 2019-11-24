@@ -97,7 +97,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
   @Override
   public String getInputFromActiveCell() {
     JTextField textField = gridPanel.getTextField();
-    return textField == null ? "" : textField.getText();
+    return textField == null || textField.getText().equals("") ? null : textField.getText();
   }
 
   @Override
@@ -143,7 +143,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
         switch (e.getKeyCode()) {
           case '\b':
             if (getActiveCell() != null) {
-              //set cell contents to empty
+              gridPanel.setActiveContents(null);
             }
             break;
           //TODO: Arrows and movement
