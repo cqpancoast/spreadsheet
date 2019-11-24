@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 /**
  * Represents a {@link IWorksheetModel} visually, as a grid of cells. Although a worksheet is
@@ -43,7 +44,6 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     }
 
     this.setTitle("Spreadsheet GUI");
-    this.setVisible(true);
 
     // grid panel showing the active cells
     this.gridPanel = new GridPanel(model, null);
@@ -61,8 +61,10 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     buttons.add(new JLabel("Adjust grid size:"));
     buttons.add(this.addRow);
     buttons.add(this.addCol);
-    this.addCol.addActionListener(evt -> gridPanel.maxRowsCols()); //TODO
-    this.addRow.addActionListener(evt -> gridPanel.maxRowsCols()); //TODO
+    this.addCol.addActionListener(evt -> gridPanel.setMaxRowsCols(
+        gridPanel.getMaxRowsCols().row, gridPanel.getMaxRowsCols().col + 1));
+    this.addRow.addActionListener(evt -> gridPanel.setMaxRowsCols(
+        gridPanel.getMaxRowsCols().row + 1, gridPanel.getMaxRowsCols().col));
 
     // add all necessary panels to the frame
     this.setLayout(new BorderLayout());
@@ -79,21 +81,23 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
   @Override
   public void render() {
     this.repaint();
+    this.setVisible(true);
   }
 
   @Override
-  public void setActiveCell(Coord coord) { //TODO
-
+  public void setActiveCell(Coord coord) {
+    this.gridPanel.setActiveCell(coord);
   }
 
   @Override
   public Coord getActiveCell() {
-    return null;
+    return this.gridPanel.getActiveCell();
   }
 
   @Override
   public String getInputFromActiveCell() {
-    return null;
+    JTextField textField = gridPanel.getTextField();
+    return textField == null ? "" : textField.getText();
   }
 
   @Override

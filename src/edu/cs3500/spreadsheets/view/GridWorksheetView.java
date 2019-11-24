@@ -26,7 +26,7 @@ public class GridWorksheetView extends JFrame implements IWorksheetView {
    * @param model a {@link IWorksheetModel} representing a worksheet
    * @throws IllegalArgumentException if model is null
    */
-  public GridWorksheetView(IWorksheetModel<?> model) {
+  public GridWorksheetView(IWorksheetModel model) {
     super();
     if (model == null) {
       throw new IllegalArgumentException("Model cannot be null.");

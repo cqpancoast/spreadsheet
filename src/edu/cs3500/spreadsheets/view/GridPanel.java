@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 public class GridPanel extends JPanel {
   private final IWorksheetModel model;
   private Coord selected;
+  private JTextField textField;
   private int maxRows;
   private int maxCols;
 
@@ -27,8 +28,9 @@ public class GridPanel extends JPanel {
    */
   GridPanel(IWorksheetModel model, Coord selected) {
     this.model = model;
-    this.maxRowsCols(model.getMaxRows(), model.getMaxColumns());
+    this.setMaxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
+    this.textField = null;
     this.setLayout(null);
   }
 
@@ -57,7 +59,7 @@ public class GridPanel extends JPanel {
           if (selected != null && selected.col == i && selected.row == j) {
             drawCell(
                 g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
-            JTextField textField = new JTextField(model.getRaw(i, j).toString());
+            textField = new JTextField(model.getRaw(i, j).toString());
             textField.setBackground(Color.ORANGE);
             textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
             textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -109,12 +111,47 @@ public class GridPanel extends JPanel {
    * @param rows  the desired amount of rows
    * @param cols  the desired amount of columns
    */
-  public void maxRowsCols(int rows, int cols) {
+  void setMaxRowsCols(int rows, int cols) {
     maxRows = Math.max(3, rows);
     maxCols = Math.max(3, cols);
   }
 
-  public Coord pixelToCoord(Point p) {
-    return null; //TODO
+  /**
+   * Returns the {@link Coord} with the greatest rows and columns in this grid.
+   */
+  Coord getMaxRowsCols() {
+    return new Coord(this.maxCols, this.maxRows);
+  }
+
+  /**
+   * Returns the text field of the active cell.
+   */
+  JTextField getTextField() {
+    return this.textField;
+  }
+
+  /**
+   * Returns the {@link Coord} of the cell that the mouse clicked.
+   *
+   * @param p  the x and y position of the mouse click in pixels
+   */
+  Coord pixelToCoord(Point p) {
+    return new Coord((int)p.getX() / 115, (int)p.getY() / 25);
+  }
+
+  /**
+   * Sets the parameterized cell as selected in the grid.
+   *
+   * @param coord  the coordinate of the cell to be selected
+   */
+  void setActiveCell(Coord coord) {
+    this.selected = coord;
+  }
+
+  /**
+   * Returns the {@link Coord} of the cell that is currently selected.
+   **/
+  Coord getActiveCell() {
+    return new Coord(selected.col, selected.row);
   }
 }

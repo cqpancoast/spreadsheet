@@ -13,7 +13,7 @@ import java.util.Set;
  * to the convention in {@link Coord}, while value is the <i>unevaluated</i> contents of that cell.
  */
 public class TextualWorksheetView implements IWorksheetView {
-  private final IWorksheetModel<?> model;
+  private final IWorksheetModel model;
   private final Appendable appendable;
 
   /**
@@ -22,7 +22,7 @@ public class TextualWorksheetView implements IWorksheetView {
    * @param appendable the place that this view prints to
    * @throws IllegalArgumentException if model or appendable is null
    */
-  public TextualWorksheetView(IWorksheetModel<?> model, Appendable appendable) {
+  public TextualWorksheetView(IWorksheetModel model, Appendable appendable) {
     if (model == null || appendable == null) {
       throw new IllegalArgumentException("Model and appendable cannot be null.");
     }
