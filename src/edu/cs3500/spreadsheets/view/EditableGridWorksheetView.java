@@ -105,8 +105,11 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     this.gridPanel.addMouseListener(new MouseListener() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (getActiveCell() == null) {
-          f.onCellSelection(gridPanel.pixelToCoord(e.getLocationOnScreen()));
+        if (getActiveCell() == null) { //HELP: How to explicitly reference enclosing class?
+          Coord selectedCell = gridPanel.pixelToCoord(e.getLocationOnScreen());
+          if (selectedCell.col >= 1 && selectedCell.row >= 1) {
+            f.onCellSelection(selectedCell);
+          }
         } else {
           f.onCellDeselection();
         }
@@ -132,6 +135,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
 
       }
     });
+
     this.gridPanel.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
@@ -141,12 +145,48 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
       @Override
       public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
+          // Delete cell contents if backspace is pressed during cell selection
           case '\b':
             if (getActiveCell() != null) {
-              gridPanel.setActiveContents(null);
+              f.onCellContentsUpdate(getActiveCell(), null);
             }
             break;
-          //TODO: Arrows and movement
+          //
+          case '\n':
+            if (getActiveCell() != null) {
+              f.onCellContentsUpdate(getActiveCell(), getInputFromActiveCell());
+            }
+            break;
+          // Handle arrow key switching cell selection
+          case KeyEvent.VK_UP:
+          case KeyEvent.VK_DOWN:
+          case KeyEvent.VK_LEFT:
+          case KeyEvent.VK_RIGHT:
+            Coord currentCoord = getActiveCell();
+            int nextRow = currentCoord.row;
+            int nextCol = currentCoord.col;
+            switch (e.getKeyCode()) {
+              case KeyEvent.VK_UP:
+                nextRow -= 1;
+                break;
+              case KeyEvent.VK_DOWN:
+                nextRow += 1;
+                break;
+              case KeyEvent.VK_LEFT:
+                nextCol -= 1;
+                break;
+              case KeyEvent.VK_RIGHT:
+                nextCol += 1;
+                break;
+            }
+            Coord nextCoord;
+            try {
+              nextCoord = new Coord(nextCol, nextRow);
+              setActiveCell(nextCoord);
+              break;
+            } catch (IllegalArgumentException ex) {
+              break;
+            }
           case 's':
             f.save();
             break;

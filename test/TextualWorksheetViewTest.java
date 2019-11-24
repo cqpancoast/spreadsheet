@@ -66,7 +66,6 @@ public class TextualWorksheetViewTest {
   }
 
   // As render calls toString directly, all tests for toString are left out.
-  //NOTE: this may change in the future if render ends up doing anything other than toString
 
   /** Tests for {@link TextualWorksheetView#render()}. */
 

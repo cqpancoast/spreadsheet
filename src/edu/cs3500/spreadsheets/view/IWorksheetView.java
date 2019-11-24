@@ -12,7 +12,7 @@ public interface IWorksheetView {
 
   /**
    * Processes a {@link IWorksheetModel} to produce a representation of it. This representation can
-   * be visual, textual, or just data.
+   * be visual, textual, or some other form of data.
    */
   void render();
 

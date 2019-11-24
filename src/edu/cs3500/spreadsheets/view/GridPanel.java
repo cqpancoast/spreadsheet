@@ -59,7 +59,7 @@ public class GridPanel extends JPanel {
           if (selected != null && selected.col == i && selected.row == j) {
             drawCell(
                 g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
-            textField = new JTextField(model.getRaw(i, j).toString());
+            textField = new JTextField(model.getRaw(i, j));
             textField.setBackground(Color.ORANGE);
             textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
             textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -112,8 +112,8 @@ public class GridPanel extends JPanel {
    * @param cols  the desired amount of columns
    */
   void setMaxRowsCols(int rows, int cols) {
-    maxRows = Math.max(3, rows);
-    maxCols = Math.max(3, cols);
+    this.maxRows = Math.max(3, rows);
+    this.maxCols = Math.max(3, cols);
   }
 
   /**
@@ -132,7 +132,6 @@ public class GridPanel extends JPanel {
 
   /**
    * Returns the {@link Coord} of the cell that the mouse clicked.
-   *
    * @param p  the x and y position of the mouse click in pixels
    */
   Coord pixelToCoord(Point p) {
@@ -143,7 +142,6 @@ public class GridPanel extends JPanel {
 
   /**
    * Sets the parameterized cell as selected in the grid.
-   *
    * @param coord  the coordinate of the cell to be selected
    */
   void setActiveCell(Coord coord) {
@@ -152,20 +150,9 @@ public class GridPanel extends JPanel {
 
   /**
    * Returns the {@link Coord} of the cell that is currently selected.
-   **/
+   */
   Coord getActiveCell() {
     return new Coord(selected.col, selected.row);
   }
 
-  /**
-   * Sets the contents of the currently selected cell.
-   *
-   * @param contents  the contents to be set
-   *
-   */
-  void setActiveContents(String contents) {
-    if (selected != null) {
-      this.model.set(selected.col, selected.row, contents);
-    }
-  }
 }
