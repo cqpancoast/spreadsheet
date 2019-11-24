@@ -152,7 +152,10 @@ public class GridPanel extends JPanel {
    * Returns the {@link Coord} of the cell that is currently selected.
    */
   Coord getActiveCell() {
-    return new Coord(selected.col, selected.row);
+    if (selected == null) {
+      return null;
+    } else {
+      return new Coord(selected.col, selected.row);
+    }
   }
-
 }

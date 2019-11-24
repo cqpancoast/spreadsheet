@@ -1,5 +1,6 @@
 package edu.cs3500.spreadsheets;
 
+import edu.cs3500.spreadsheets.controller.WorksheetController;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.SexpEvaluator;
@@ -76,7 +77,9 @@ public class BeyondGood {
       }
     } else if (args[2].equals("-edit") || args[0].equals("-edit")) {
       try {
-        new EditableGridWorksheetView(model).render();
+        WorksheetController controller = new WorksheetController(model);
+        controller.setView(new EditableGridWorksheetView(model));
+        controller.go();
       } catch (Exception e) {
         System.out.println(e.getMessage());
         System.out.println("Error in displaying editable grid, man.");

@@ -6,6 +6,7 @@ import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -61,10 +62,8 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     buttons.add(new JLabel("Adjust grid size:"));
     buttons.add(this.addRow);
     buttons.add(this.addCol);
-    this.addCol.addActionListener(evt -> gridPanel.setMaxRowsCols(
-        gridPanel.getMaxRowsCols().row, gridPanel.getMaxRowsCols().col + 1));
-    this.addRow.addActionListener(evt -> gridPanel.setMaxRowsCols(
-        gridPanel.getMaxRowsCols().row + 1, gridPanel.getMaxRowsCols().col));
+    this.addCol.addActionListener(this::addCol);
+    this.addRow.addActionListener(this::addRow);
 
     // add all necessary panels to the frame
     this.setLayout(new BorderLayout());
@@ -76,6 +75,18 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     // handle keyEvents by calling methods in featureListener
 
 
+  }
+
+  private void addCol(ActionEvent evt) {
+    gridPanel.setMaxRowsCols(
+        gridPanel.getMaxRowsCols().row, gridPanel.getMaxRowsCols().col + 1);
+    this.render();
+  }
+
+  private void addRow(ActionEvent evt) {
+    gridPanel.setMaxRowsCols(
+        gridPanel.getMaxRowsCols().row + 1, gridPanel.getMaxRowsCols().col);
+    this.render();
   }
 
   @Override
