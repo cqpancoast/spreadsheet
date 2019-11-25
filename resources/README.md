@@ -57,3 +57,19 @@ The interface for the view is `WorksheetView`. It's purpose is to visually repre
  of each cell in their properly corresponding cells in the grid.
 
 ## The Controller
+
+### Interfaces
+
+There are two interfaces involved in our implementation of the controller: `IWorksheetController`
+and `FeatureListener`. In this manner, we separated `WorksheetController`'s (our only controller
+implementation class) functionality as a controller from it's functionality as something that
+listens for stuff to happen in a view.
+
+### Changes to the View
+
+After splitting the view into `EditableGridWorksheetView` and the regular read-only version
+`GridWorksheetView`, we added methods to their interface `WorksheetView` that gave the ability
+to add `FeatureListener`s to the both, though in `GridWorksheetView` and in `TextualWorksheetView`
+those methods do nothing. In `EditableGridWorksheetView`, when a `FeatureListener` is added, the
+view "hooks up" the listener to a bunch of swing events that occur. In this way, we are able to
+completely divorce the controller from swing. Yippee!

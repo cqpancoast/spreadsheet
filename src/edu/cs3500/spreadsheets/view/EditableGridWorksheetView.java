@@ -6,6 +6,7 @@ import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -71,18 +72,22 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     this.add(buttons, BorderLayout.PAGE_START);
 
     this.pack();
-
-    // handle keyEvents by calling methods in featureListener
-
-
   }
 
+  /**
+   * Adds a column to the grid view.
+   * @param evt  an action event from a component intended to call this method
+   */
   private void addCol(ActionEvent evt) {
     gridPanel.setMaxRowsCols(
         gridPanel.getMaxRowsCols().row, gridPanel.getMaxRowsCols().col + 1);
     this.render();
   }
 
+  /**
+   * Adds a row to the grid view.
+   * @param evt  an action event from a component intended to call this method
+   */
   private void addRow(ActionEvent evt) {
     gridPanel.setMaxRowsCols(
         gridPanel.getMaxRowsCols().row + 1, gridPanel.getMaxRowsCols().col);
@@ -107,7 +112,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
 
   @Override
   public String getInputFromActiveCell() {
-    JTextField textField = gridPanel.getTextField();
+    JTextField textField = this.gridPanel.getTextField();
     return textField == null || textField.getText().equals("") ? null : textField.getText();
   }
 
@@ -116,8 +121,11 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     this.gridPanel.addMouseListener(new MouseListener() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (getActiveCell() == null) { //HELP: How to explicitly reference enclosing class?
-          Coord selectedCell = gridPanel.pixelToCoord(e.getLocationOnScreen());
+        if (EditableGridWorksheetView.this.getActiveCell() == null) {
+          Point clickPoint = e.getPoint();
+          final int GRID_PANEL_BORDER = 17;
+          clickPoint.translate(-GRID_PANEL_BORDER, -GRID_PANEL_BORDER); // Translate by the border surrounding gridPanel
+          Coord selectedCell = EditableGridWorksheetView.this.gridPanel.pixelToCoord(clickPoint);
           if (selectedCell.col >= 1 && selectedCell.row >= 1) {
             f.onCellSelection(selectedCell);
           }
@@ -147,25 +155,19 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
       }
     });
 
-    this.gridPanel.addKeyListener(new KeyListener() {
+    this.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-
+        System.out.println("Key typed:" + e.getKeyChar()); //TODO why isn't this keyboard listener listening!?
       }
 
       @Override
       public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
           // Delete cell contents if backspace is pressed during cell selection
-          case '\b':
-            if (getActiveCell() != null) {
-              f.onCellContentsUpdate(getActiveCell(), null);
-            }
-            break;
-          //
-          case '\n':
-            if (getActiveCell() != null) {
-              f.onCellContentsUpdate(getActiveCell(), getInputFromActiveCell());
+          case KeyEvent.VK_DELETE:
+            if (EditableGridWorksheetView.this.getActiveCell() != null) {
+              f.onCellContentsUpdate(EditableGridWorksheetView.this.getActiveCell(), null);
             }
             break;
           // Handle arrow key switching cell selection
@@ -173,7 +175,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
           case KeyEvent.VK_DOWN:
           case KeyEvent.VK_LEFT:
           case KeyEvent.VK_RIGHT:
-            Coord currentCoord = getActiveCell();
+            Coord currentCoord = EditableGridWorksheetView.this.getActiveCell();
             int nextRow = currentCoord.row;
             int nextCol = currentCoord.col;
             switch (e.getKeyCode()) {
@@ -193,7 +195,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
             Coord nextCoord;
             try {
               nextCoord = new Coord(nextCol, nextRow);
-              setActiveCell(nextCoord);
+              f.onCellSelection(nextCoord);
               break;
             } catch (IllegalArgumentException ex) {
               break;

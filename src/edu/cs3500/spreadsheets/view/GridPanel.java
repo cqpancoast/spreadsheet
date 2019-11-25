@@ -137,7 +137,7 @@ public class GridPanel extends JPanel {
   Coord pixelToCoord(Point p) {
     int col = (int)p.getX() / CELL_WIDTH;
     int row = (int)p.getY() / CELL_HEIGHT;
-    return col <= 1 || row <= 1 ? null : new Coord(col, row);
+    return col < 1 || row < 1 ? null : new Coord(col, row);
   }
 
   /**
@@ -145,6 +145,7 @@ public class GridPanel extends JPanel {
    * @param coord  the coordinate of the cell to be selected
    */
   void setActiveCell(Coord coord) {
+    this.removeAll();
     this.selected = coord;
   }
 
@@ -152,10 +153,10 @@ public class GridPanel extends JPanel {
    * Returns the {@link Coord} of the cell that is currently selected.
    */
   Coord getActiveCell() {
-    if (selected == null) {
+    if (this.selected == null) {
       return null;
     } else {
-      return new Coord(selected.col, selected.row);
+      return new Coord(this.selected.col, this.selected.row);
     }
   }
 }
