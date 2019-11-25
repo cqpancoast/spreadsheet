@@ -31,6 +31,7 @@ import javax.swing.JTextField;
  */
 public class EditableGridWorksheetView extends JFrame implements IWorksheetView {
   private final GridPanel gridPanel;
+  private final JScrollPane scrollGrid;
   private JButton addRow;
   private JButton addCol;
 
@@ -50,10 +51,10 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     // grid panel showing the active cells
     this.gridPanel = new GridPanel(model, null);
     Dimension gridSize = this.gridPanel.getPreferredSize();
-    JScrollPane scrollGrid = new JScrollPane(this.gridPanel);
+    this.scrollGrid = new JScrollPane(this.gridPanel);
     scrollGrid.setBorder(BorderFactory.createEmptyBorder());
     scrollGrid.setPreferredSize(
-        new Dimension(Math.min(gridSize.width, 1100), Math.min(gridSize.height, 600)));
+        new Dimension(Math.min(gridSize.width, 1200), Math.min(gridSize.height, 650)));
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
@@ -81,6 +82,10 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
   private void addCol(ActionEvent evt) {
     gridPanel.setMaxRowsCols(
         gridPanel.getMaxRowsCols().row, gridPanel.getMaxRowsCols().col + 1);
+    Dimension gridSize = gridPanel.getPreferredSize();
+    this.scrollGrid.setPreferredSize(
+        new Dimension(Math.min(gridSize.width, 1200), Math.min(gridSize.height, 650)));
+    this.pack();
     this.render();
   }
 
@@ -91,6 +96,10 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
   private void addRow(ActionEvent evt) {
     gridPanel.setMaxRowsCols(
         gridPanel.getMaxRowsCols().row + 1, gridPanel.getMaxRowsCols().col);
+    Dimension gridSize = gridPanel.getPreferredSize();
+    this.scrollGrid.setPreferredSize(
+        new Dimension(Math.min(gridSize.width, 1200), Math.min(gridSize.height, 650)));
+    this.pack();
     this.render();
   }
 
@@ -126,7 +135,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
           final int GRID_PANEL_BORDER = 17;
           clickPoint.translate(-GRID_PANEL_BORDER, -GRID_PANEL_BORDER); // Translate by the border surrounding gridPanel
           Coord selectedCell = EditableGridWorksheetView.this.gridPanel.pixelToCoord(clickPoint);
-          if (selectedCell.col >= 1 && selectedCell.row >= 1) {
+          if (selectedCell != null && selectedCell.col >= 1 && selectedCell.row >= 1) {
             f.onCellSelection(selectedCell);
           }
         } else {
