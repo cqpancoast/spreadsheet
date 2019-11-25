@@ -72,6 +72,9 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     this.add(buttons, BorderLayout.PAGE_START);
 
     this.pack();
+
+    this.setFocusable(true);
+    this.requestFocus();
   }
 
   /**
@@ -158,14 +161,14 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     this.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-        System.out.println("Key typed:" + e.getKeyChar()); //TODO why isn't this keyboard listener listening!?
+
       }
 
       @Override
       public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
           // Delete cell contents if backspace is pressed during cell selection
-          case KeyEvent.VK_DELETE:
+          case KeyEvent.VK_D:
             if (EditableGridWorksheetView.this.getActiveCell() != null) {
               f.onCellContentsUpdate(EditableGridWorksheetView.this.getActiveCell(), null);
             }
@@ -192,18 +195,16 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
                 nextCol += 1;
                 break;
             }
-            Coord nextCoord;
-            try {
-              nextCoord = new Coord(nextCol, nextRow);
+            Coord maxCoord = EditableGridWorksheetView.this.gridPanel.getMaxRowsCols();
+            if (!(nextCol < 1 || nextRow < 1 || nextCol > maxCoord.col || nextRow > maxCoord.row)) {
+              Coord nextCoord = new Coord(nextCol, nextRow);
               f.onCellSelection(nextCoord);
-              break;
-            } catch (IllegalArgumentException ex) {
-              break;
             }
-          case 's':
+            break;
+          case KeyEvent.VK_S:
             f.save();
             break;
-          case 'q':
+          case KeyEvent.VK_Q:
             f.quit();
             break;
         }

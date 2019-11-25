@@ -1,5 +1,7 @@
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 import edu.cs3500.spreadsheets.controller.FeatureListener;
 import edu.cs3500.spreadsheets.controller.WorksheetController;
@@ -9,6 +11,10 @@ import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
 import edu.cs3500.spreadsheets.view.IWorksheetView;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Test;
 
 /**
@@ -112,9 +118,21 @@ public class WorksheetControllerTest {
 
   @Test
   public void saveToCorrectFile() {
+    Path saveFilePath = Paths.get("savedFile.gOOD").toAbsolutePath();
+    System.out.println(saveFilePath);
+    try {
+      Files.deleteIfExists(saveFilePath);
+    } catch (IOException e) {
+      fail();
+    }
     initMVC();
-    //TODO delete saveFile
-    // check save file exists, contains render contents
+    controller.save();
+    assertTrue(Files.exists(saveFilePath));
+    try {
+      Files.delete(saveFilePath);
+    } catch (IOException e) {
+      fail();
+    }
   }
 
   /** There are no tests for {@link WorksheetController#quit()} as that exits the program, and as
