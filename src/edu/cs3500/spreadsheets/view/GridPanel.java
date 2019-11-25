@@ -1,5 +1,6 @@
 package edu.cs3500.spreadsheets.view;
 
+import edu.cs3500.spreadsheets.controller.FeatureListener;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.awt.Color;
@@ -8,6 +9,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -20,6 +25,7 @@ public class GridPanel extends JPanel {
   private JTextField textField;
   private int maxRows;
   private int maxCols;
+  private List<FeatureListener> featureListeners;
 
   /**
    * Constructs a {@link GridPanel}.
@@ -30,14 +36,9 @@ public class GridPanel extends JPanel {
     this.model = model;
     this.setMaxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
-    this.textField = new JTextField();
-    textField.setBackground(Color.ORANGE);
-    textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-    textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-    textField.setSize(CELL_WIDTH, CELL_HEIGHT);
-    this.add(textField);
-    textField.setVisible(false);
+    this.textField = null;
     this.setLayout(null);
+    this.featureListeners = new ArrayList<>();
   }
 
   private static final int CELL_WIDTH = 115;
@@ -63,13 +64,44 @@ public class GridPanel extends JPanel {
         }
         else {
           if (selected != null && selected.col == i && selected.row == j) {
+            final int col = i;
+            final int row = j;
             drawCell(
                 g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
+            this.textField = new JTextField(model.getRaw(i, j));
+            textField.setBackground(Color.ORANGE);
+            textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+            textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+            this.add(textField);
             textField.setSize(CELL_WIDTH, CELL_HEIGHT);
             textField.setLocation(15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT);
-            textField.setText(model.getRaw(i, j));
-            textField.setVisible(true);
-            //System.out.println(String.format("text field x, y: %d, %d", textField.getX(), textField.getY()));
+            for (FeatureListener f : this.featureListeners) {
+              textField.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                  switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER:
+                      f.onCellContentsUpdate(new Coord(col, row), textField.getText());
+                      selected = null; //Deselect the cell
+                      break;
+                    case KeyEvent.VK_ESCAPE:
+                      System.out.println("Pressed escape");
+                      selected = null; //Deselect the cell
+                      break;
+                  }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+
+                }
+              });
+            }
           }
           else {
             drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
@@ -158,5 +190,13 @@ public class GridPanel extends JPanel {
    */
   Coord getActiveCell() {
     return selected == null ? null : new Coord(selected.col, selected.row);
+  }
+
+  /**
+   * Adds a FeatureListener to listen for features inside of this GridPanel.
+   * @param f  a FeatureListener
+   */
+  void addFeatureListener(FeatureListener f) {
+    this.featureListeners.add(f);
   }
 }

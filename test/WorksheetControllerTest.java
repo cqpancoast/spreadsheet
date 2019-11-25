@@ -119,7 +119,6 @@ public class WorksheetControllerTest {
   @Test
   public void saveToCorrectFile() {
     Path saveFilePath = Paths.get("savedFile.gOOD").toAbsolutePath();
-    System.out.println(saveFilePath);
     try {
       Files.deleteIfExists(saveFilePath);
     } catch (IOException e) {

@@ -81,7 +81,7 @@ public class BeyondGood {
         controller.setView(new EditableGridWorksheetView(model));
         controller.go();
       } catch (Exception e) {
-        System.out.println(e.getMessage());
+        e.printStackTrace();
         System.out.println("Error in displaying editable grid, man.");
       }
     }

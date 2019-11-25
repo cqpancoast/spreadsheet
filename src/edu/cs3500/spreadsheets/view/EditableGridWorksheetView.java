@@ -130,6 +130,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
 
   @Override
   public void addFeatureListener(FeatureListener f) {
+    this.gridPanel.addFeatureListener(f);
     this.gridPanel.addMouseListener(new MouseListener() {
       @Override
       public void mouseClicked(MouseEvent e) {
