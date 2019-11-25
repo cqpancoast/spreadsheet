@@ -30,7 +30,13 @@ public class GridPanel extends JPanel {
     this.model = model;
     this.setMaxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
-    this.textField = null;
+    this.textField = new JTextField();
+    textField.setBackground(Color.ORANGE);
+    textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+    textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+    textField.setSize(CELL_WIDTH, CELL_HEIGHT);
+    this.add(textField);
+    textField.setVisible(false);
     this.setLayout(null);
   }
 
@@ -59,13 +65,11 @@ public class GridPanel extends JPanel {
           if (selected != null && selected.col == i && selected.row == j) {
             drawCell(
                 g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
-            textField = new JTextField(model.getRaw(i, j));
-            textField.setBackground(Color.ORANGE);
-            textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-            textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-            this.add(textField);
             textField.setSize(CELL_WIDTH, CELL_HEIGHT);
             textField.setLocation(15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT);
+            textField.setText(model.getRaw(i, j));
+            textField.setVisible(true);
+            //System.out.println(String.format("text field x, y: %d, %d", textField.getX(), textField.getY()));
           }
           else {
             drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
@@ -153,10 +157,6 @@ public class GridPanel extends JPanel {
    * Returns the {@link Coord} of the cell that is currently selected.
    */
   Coord getActiveCell() {
-    if (this.selected == null) {
-      return null;
-    } else {
-      return new Coord(this.selected.col, this.selected.row);
-    }
+    return selected == null ? null : new Coord(selected.col, selected.row);
   }
 }
