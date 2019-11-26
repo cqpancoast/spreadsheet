@@ -4,8 +4,10 @@ import edu.cs3500.spreadsheets.controller.FeatureListener;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -30,10 +32,12 @@ import javax.swing.JTextField;
  * population.
  */
 public class EditableGridWorksheetView extends JFrame implements IWorksheetView {
+  private final IWorksheetModel model;
   private final GridPanel gridPanel;
+  private Coord selected;
   private final JScrollPane scrollGrid;
-  private JButton addRow;
-  private JButton addCol;
+  private JTextField textField;
+  private JLabel textLabel;
 
   /**
    * Creates a {@link EditableGridWorksheetView}.
@@ -45,11 +49,13 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     if (model == null) {
       throw new IllegalArgumentException("Model cannot be null.");
     }
+    this.model = model;
+    this.selected = null;
 
     this.setTitle("Spreadsheet GUI");
 
     // grid panel showing the active cells
-    this.gridPanel = new GridPanel(model, null);
+    this.gridPanel = new GridPanel(model);
     Dimension gridSize = this.gridPanel.getPreferredSize();
     this.scrollGrid = new JScrollPane(this.gridPanel);
     scrollGrid.setBorder(BorderFactory.createEmptyBorder());
@@ -58,19 +64,36 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
 
     // button panel to increase number of rows or columns
     JPanel buttons = new JPanel();
-    this.addRow = new JButton("add row");
-    this.addCol = new JButton("add column");
+    JButton addRow = new JButton("add row");
+    JButton addCol = new JButton("add column");
     buttons.setLayout(new FlowLayout());
     buttons.add(new JLabel("Adjust grid size:"));
-    buttons.add(this.addRow);
-    buttons.add(this.addCol);
-    this.addCol.addActionListener(this::addCol);
-    this.addRow.addActionListener(this::addRow);
+    buttons.add(addRow);
+    buttons.add(addCol);
+    addCol.addActionListener(this::addCol);
+    addRow.addActionListener(this::addRow);
+
+    // text field to enter changes to selected cells
+    JPanel editPanel = new JPanel();
+    editPanel.setLayout(new FlowLayout());
+    textLabel = new JLabel();
+    this.textLabel.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+    this.textField = new JTextField(20);
+    this.textField.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+    this.textField.setBorder(javax.swing.BorderFactory.createLineBorder(Color.ORANGE));
+    editPanel.add(this.textLabel);
+    editPanel.add(this.textField);
+
+    // buttons and editing field in one panel
+    JPanel buttonsAndEdit = new JPanel();
+    buttonsAndEdit.setLayout(new BorderLayout());
+    buttonsAndEdit.add(buttons, BorderLayout.PAGE_START);
+    buttonsAndEdit.add(editPanel, BorderLayout.CENTER);
 
     // add all necessary panels to the frame
     this.setLayout(new BorderLayout());
     this.add(scrollGrid, BorderLayout.CENTER);
-    this.add(buttons, BorderLayout.PAGE_START);
+    this.add(buttonsAndEdit, BorderLayout.PAGE_START);
 
     this.pack();
 
@@ -115,17 +138,22 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
   @Override
   public void setActiveCell(Coord coord) {
     this.gridPanel.setActiveCell(coord);
+    if (coord != null) {
+      textLabel.setText(gridPanel.getActiveCell().toString() + ": ");
+      textField.setText(model.getRaw(coord.col, coord.row));
+      selected = coord;
+      gridPanel.setActiveCell(coord);
+    } else {
+      selected = null;
+      gridPanel.setActiveCell(null);
+      textLabel.setText("");
+      textField.setText("");
+    }
   }
 
   @Override
   public Coord getActiveCell() {
     return this.gridPanel.getActiveCell();
-  }
-
-  @Override
-  public String getInputFromActiveCell() {
-    JTextField textField = this.gridPanel.getTextField();
-    return textField == null || textField.getText().equals("") ? null : textField.getText();
   }
 
   @Override
@@ -182,8 +210,8 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
             Coord active = EditableGridWorksheetView.this.getActiveCell();
             if (active != null) {
               f.onCellContentsUpdate(active, null);
-              EditableGridWorksheetView.this.gridPanel.setActiveCell(null);
-              EditableGridWorksheetView.this.gridPanel.setActiveCell(active);
+              EditableGridWorksheetView.this.setActiveCell(null);
+              EditableGridWorksheetView.this.setActiveCell(active);
             }
             break;
           // Handle arrow key switching cell selection
@@ -220,6 +248,33 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
           case KeyEvent.VK_Q:
             f.quit();
             break;
+        }
+      }
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+
+      }
+    });
+
+    this.textField.addKeyListener(new KeyListener() {
+      @Override
+      public void keyTyped(KeyEvent e) {
+
+      }
+
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (selected != null) {
+          switch (e.getKeyCode()) {
+            case KeyEvent.VK_ENTER:
+              f.onCellContentsUpdate(new Coord(selected.col, selected.row), textField.getText());
+              f.onCellDeselection();
+              break;
+            case KeyEvent.VK_ESCAPE:
+              f.onCellDeselection();
+              break;
+          }
         }
       }
 

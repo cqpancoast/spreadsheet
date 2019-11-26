@@ -28,12 +28,6 @@ public interface IWorksheetView {
   Coord getActiveCell();
 
   /**
-   * Returns the string of input currently in the active cell, or null if no cell is active.
-   * @return string of input currently in the active cell or null
-   */
-  String getInputFromActiveCell();
-
-  /**
    * Adds an additional listener to any that already exist that wait for activation in some manner,
    * from either user control or the view itself.
    * @param f a listener that waits for feature-specific activation from the view

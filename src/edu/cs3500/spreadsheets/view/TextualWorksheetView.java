@@ -51,11 +51,6 @@ public class TextualWorksheetView implements IWorksheetView {
   }
 
   @Override
-  public String getInputFromActiveCell() {
-    return null;
-  }
-
-  @Override
   public void addFeatureListener(FeatureListener f) {
 
   }

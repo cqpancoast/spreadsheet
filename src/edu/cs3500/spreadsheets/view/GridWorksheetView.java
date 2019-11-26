@@ -36,7 +36,7 @@ public class GridWorksheetView extends JFrame implements IWorksheetView {
     this.setVisible(true);
 
     // grid panel showing the active cells
-    JPanel grid = new GridPanel(model, null);
+    JPanel grid = new GridPanel(model);
     Dimension gridSize = grid.getPreferredSize();
     JScrollPane scrollGrid = new JScrollPane(grid);
     scrollGrid.setBorder(BorderFactory.createEmptyBorder());
@@ -62,11 +62,6 @@ public class GridWorksheetView extends JFrame implements IWorksheetView {
 
   @Override
   public Coord getActiveCell() {
-    return null;
-  }
-
-  @Override
-  public String getInputFromActiveCell() {
     return null;
   }
 

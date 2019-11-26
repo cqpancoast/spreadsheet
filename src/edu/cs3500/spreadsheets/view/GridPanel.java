@@ -9,12 +9,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 /**
  * The panel that holds the grid in a {@link GridWorksheetView}.
@@ -22,7 +19,6 @@ import javax.swing.JTextField;
 public class GridPanel extends JPanel {
   private final IWorksheetModel model;
   private Coord selected;
-  private JTextField textField;
   private int maxRows;
   private int maxCols;
   private List<FeatureListener> featureListeners;
@@ -30,19 +26,11 @@ public class GridPanel extends JPanel {
   /**
    * Constructs a {@link GridPanel}.
    * @param model the {@link IWorksheetModel} used to build the grid
-   * @param selected coordinates of selected cell
    */
-  GridPanel(IWorksheetModel model, Coord selected) {
+  GridPanel(IWorksheetModel model) {
     this.model = model;
     this.setMaxRowsCols(model.getMaxRows(), model.getMaxColumns());
-    this.selected = selected;
-    this.textField = new JTextField();
-    textField.setBackground(Color.ORANGE);
-    textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-    textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-    this.add(textField);
-    textField.setSize(CELL_WIDTH, CELL_HEIGHT);
-    textField.setLocation(45, 0);
+    this.selected = null;
     this.setLayout(null);
     this.featureListeners = new ArrayList<>();
   }
@@ -57,54 +45,24 @@ public class GridPanel extends JPanel {
 
     Graphics2D g2d = (Graphics2D)g;
 
-    if (selected != null) {
-      g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-      g2d.drawString(this.selected.toString() + ":", 20, 17);
-    }
     for (int i = 0; i <= maxCols; i++) {
       for (int j = 0; j <= maxRows; j++) {
         if (i == 0 && j == 0) {
-          drawCell(g2d, 15, 30, Color.LIGHT_GRAY, "");
+          drawCell(g2d, 15, 15, Color.LIGHT_GRAY, "");
         }
         else if (i == 0) {
-          drawCell(g2d, 15, 30 + j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
+          drawCell(g2d, 15, 15 + j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
         }
         else if (j == 0) {
-          drawCell(g2d,  15 + i * CELL_WIDTH, 30, Color.LIGHT_GRAY, Coord.colIndexToName(i));
+          drawCell(g2d,  15 + i * CELL_WIDTH, 15, Color.LIGHT_GRAY, Coord.colIndexToName(i));
         }
         else {
-          drawCell(g2d, 15 + i * CELL_WIDTH, 30 + j * CELL_HEIGHT,
-              Color.WHITE, model.getEval(i, j));
           if (selected != null && selected.col == i && selected.row == j) {
-            final int col = i;
-            final int row = j;
-            textField.setText(model.getRaw(i, j));
-            for (FeatureListener f : this.featureListeners) {
-              textField.addKeyListener(new KeyListener() {
-                @Override
-                public void keyTyped(KeyEvent e) {
-
-                }
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-                  switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ENTER:
-                      f.onCellContentsUpdate(new Coord(col, row), textField.getText());
-                      selected = null; //Deselect the cell
-                      break;
-                    case KeyEvent.VK_ESCAPE:
-                      selected = null; //Deselect the cell
-                      break;
-                  }
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-
-                }
-              });
-            }
+            drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
+                Color.ORANGE, model.getEval(i, j));
+          } else {
+            drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
+                Color.WHITE, model.getEval(i, j));
           }
         }
       }
@@ -114,7 +72,7 @@ public class GridPanel extends JPanel {
   @Override
   public Dimension getPreferredSize() {
     return new Dimension(
-        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 45);
+        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 30);
   }
 
   /**
@@ -159,19 +117,12 @@ public class GridPanel extends JPanel {
   }
 
   /**
-   * Returns the text field of the active cell.
-   */
-  JTextField getTextField() {
-    return this.textField;
-  }
-
-  /**
    * Returns the {@link Coord} of the cell that the mouse clicked.
    * @param p  the x and y position of the mouse click in pixels
    */
   Coord pixelToCoord(Point p) {
     int col = (int)p.getX() / CELL_WIDTH;
-    int row = ((int)p.getY() - 15) / CELL_HEIGHT;
+    int row = (int)p.getY() / CELL_HEIGHT;
     return col < 1 || row < 1 ? null : new Coord(col, row);
   }
 
