@@ -57,7 +57,7 @@ public class GridWorksheetView extends JFrame implements IWorksheetView {
 
   @Override
   public void setActiveCell(Coord coord) {
-
+    // Non-editable grid class doesn't support notions of active cells
   }
 
   @Override
@@ -67,6 +67,6 @@ public class GridWorksheetView extends JFrame implements IWorksheetView {
 
   @Override
   public void addFeatureListener(FeatureListener f) {
-
+    // Non-editable grid class doesn't need featureListeners
   }
 }

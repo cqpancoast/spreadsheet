@@ -35,7 +35,7 @@ public class WorksheetController implements IWorksheetController, FeatureListene
   }
 
   @Override
-  public void go() {
+  public void commence() {
     this.view.render();
   }
 

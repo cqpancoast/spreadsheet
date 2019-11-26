@@ -165,8 +165,9 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
       public void mouseClicked(MouseEvent e) {
         if (EditableGridWorksheetView.this.getActiveCell() == null) {
           Point clickPoint = e.getPoint();
-          final int GRID_PANEL_BORDER = 17;
-          clickPoint.translate(-GRID_PANEL_BORDER, -GRID_PANEL_BORDER); // Translate by the border surrounding gridPanel
+          final int gridPanelBorder = 17;
+          // Translate by the border surrounding gridPanel
+          clickPoint.translate(-gridPanelBorder, -gridPanelBorder);
           Coord selectedCell = EditableGridWorksheetView.this.gridPanel.pixelToCoord(clickPoint);
           if (selectedCell != null && selectedCell.col >= 1 && selectedCell.row >= 1) {
             f.onCellSelection(selectedCell);
@@ -178,29 +179,29 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
 
       @Override
       public void mousePressed(MouseEvent e) {
-
+        // This mouseListener doesn't listen for this mouseEvent
       }
 
       @Override
       public void mouseReleased(MouseEvent e) {
-
+        // This mouseListener doesn't listen for this mouseEvent
       }
 
       @Override
       public void mouseEntered(MouseEvent e) {
-
+        // This mouseListener doesn't listen for this mouseEvent
       }
 
       @Override
       public void mouseExited(MouseEvent e) {
-
+        // This mouseListener doesn't listen for this mouseEvent
       }
     });
 
     this.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-
+        // This keyListener doesn't listen for this keyEvent
       }
 
       @Override
@@ -237,6 +238,8 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
               case KeyEvent.VK_RIGHT:
                 nextCol += 1;
                 break;
+              default:
+                // unreachable code
             }
             Coord maxCoord = EditableGridWorksheetView.this.gridPanel.getMaxRowsCols();
             if (!(nextCol < 1 || nextRow < 1 || nextCol > maxCoord.col || nextRow > maxCoord.row)) {
@@ -250,19 +253,21 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
           case KeyEvent.VK_Q:
             f.quit();
             break;
+          default:
+            // do nothing
         }
       }
 
       @Override
       public void keyReleased(KeyEvent e) {
-
+        // This keyListener doesn't listen for this keyEvent
       }
     });
 
     this.textField.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-
+        // This keyListener doesn't listen for this keyEvent
       }
 
       @Override
@@ -276,13 +281,15 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
             case KeyEvent.VK_ESCAPE:
               f.onCellDeselection();
               break;
+            default:
+              // do nothing
           }
         }
       }
 
       @Override
       public void keyReleased(KeyEvent e) {
-
+        // This keyListener doesn't listen for this keyEvent
       }
     });
   }

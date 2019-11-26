@@ -13,7 +13,7 @@ public interface IWorksheetController {
   /**
    * Runs this controller.
    */
-  void go();
+  void commence();
 
   /**
    * Sets the view that this controller displays to.

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Represents a {@link IWorksheetModel} textually, saving this representation to some appendable. The
+ * Represents a {@link IWorksheetModel} textually, saving this representation to some appendable.The
  * representation is an unordered set of cell-value pairs, with the scheme "[cell] [value]" for each
  * line in the file. The cell is the string representation of a cells position in the grid according
  * to the convention in {@link Coord}, while value is the <i>unevaluated</i> contents of that cell.
@@ -42,7 +42,7 @@ public class TextualWorksheetView implements IWorksheetView {
 
   @Override
   public void setActiveCell(Coord coord) {
-
+    // Textual class doesn't support a notion of active cells
   }
 
   @Override
@@ -52,7 +52,7 @@ public class TextualWorksheetView implements IWorksheetView {
 
   @Override
   public void addFeatureListener(FeatureListener f) {
-
+    // Textual class doesn't need featureListeners
   }
 
   @Override
