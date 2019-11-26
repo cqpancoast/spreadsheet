@@ -9,6 +9,7 @@ import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
+import edu.cs3500.spreadsheets.view.GridWorksheetView;
 import edu.cs3500.spreadsheets.view.IWorksheetView;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
 import java.io.IOException;
@@ -60,7 +61,6 @@ public class WorksheetControllerTest {
 
   /**
    * Constructs a {@link IWorksheetModel} with some basic sample data.
-   * @return  a basic model
    */
   private void initModel() {
     this.model = new FormulaWorksheetModel.FormulaWorksheetBuilder()
@@ -78,10 +78,8 @@ public class WorksheetControllerTest {
     initMVC();
     StringBuilder appendable = new StringBuilder();
     IWorksheetView textualView = new TextualWorksheetView(model, appendable);
-
-    assertEquals("", appendable.toString());
-
-    //assertNotSame("", appendable.toString());
+    IWorksheetView visualView = new GridWorksheetView(model);
+    IWorksheetView editableView = new EditableGridWorksheetView(model);
   }
 
   /** Tests for {@link WorksheetController#onCellSelection(Coord)} and

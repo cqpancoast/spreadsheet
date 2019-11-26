@@ -86,11 +86,10 @@ public class GridPanel extends JPanel {
                 public void keyPressed(KeyEvent e) {
                   switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                      f.onCellContentsUpdate(new Coord(col, row), textField.getText());
+                      f.onCellContentsUpdate(new Coord(col, row), GridPanel.this.getInputText());
                       selected = null; //Deselect the cell
                       break;
                     case KeyEvent.VK_ESCAPE:
-                      System.out.println("Pressed escape");
                       selected = null; //Deselect the cell
                       break;
                   }
@@ -110,6 +109,14 @@ public class GridPanel extends JPanel {
         }
       }
     }
+  }
+
+  /**
+   * Returns the string from the text field.
+   */
+  private String getInputText() {
+    System.out.println(textField.getText());
+    return textField.getText();
   }
 
   @Override

@@ -178,9 +178,12 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
       public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
           // Delete cell contents if backspace is pressed during cell selection
-          case KeyEvent.VK_D:
-            if (EditableGridWorksheetView.this.getActiveCell() != null) {
-              f.onCellContentsUpdate(EditableGridWorksheetView.this.getActiveCell(), null);
+          case KeyEvent.VK_BACK_SPACE:
+            Coord active = EditableGridWorksheetView.this.getActiveCell();
+            if (active != null) {
+              f.onCellContentsUpdate(active, null);
+              EditableGridWorksheetView.this.gridPanel.setActiveCell(null);
+              EditableGridWorksheetView.this.gridPanel.setActiveCell(active);
             }
             break;
           // Handle arrow key switching cell selection
