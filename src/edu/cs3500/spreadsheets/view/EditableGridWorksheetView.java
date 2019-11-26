@@ -113,6 +113,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
         new Dimension(Math.min(gridSize.width, 1200), Math.min(gridSize.height, 650)));
     this.pack();
     this.render();
+    this.requestFocus();
   }
 
   /**
@@ -127,6 +128,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
         new Dimension(Math.min(gridSize.width, 1200), Math.min(gridSize.height, 650)));
     this.pack();
     this.render();
+    this.requestFocus();
   }
 
   @Override
@@ -146,7 +148,6 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     } else {
       selected = null;
       gridPanel.setActiveCell(null);
-      textLabel.setText("");
       textField.setText("");
     }
   }
@@ -212,6 +213,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
               f.onCellContentsUpdate(active, null);
               EditableGridWorksheetView.this.setActiveCell(null);
               EditableGridWorksheetView.this.setActiveCell(active);
+              EditableGridWorksheetView.this.requestFocus();
             }
             break;
           // Handle arrow key switching cell selection
