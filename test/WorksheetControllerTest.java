@@ -9,9 +9,7 @@ import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
-import edu.cs3500.spreadsheets.view.GridWorksheetView;
 import edu.cs3500.spreadsheets.view.IWorksheetView;
-import edu.cs3500.spreadsheets.view.TextualWorksheetView;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,16 +69,9 @@ public class WorksheetControllerTest {
         .createWorksheet();
   }
 
-  /** Tests for {@link WorksheetController#setView(IWorksheetView)}. */
-
-  @Test
-  public void setViewTest() {
-    initMVC();
-    StringBuilder appendable = new StringBuilder();
-    IWorksheetView textualView = new TextualWorksheetView(model, appendable);
-    IWorksheetView visualView = new GridWorksheetView(model);
-    IWorksheetView editableView = new EditableGridWorksheetView(model);
-  }
+  /** There are no tests for {@link WorksheetController#setView(IWorksheetView)} because the only
+   * way to test that would be using GUI rendering and because the functionality is simple enough
+   * that we are not particularly worried anyway. */
 
   /** Tests for {@link WorksheetController#onCellSelection(Coord)} and
    * {@link WorksheetController#onCellDeselection()}. */
