@@ -36,7 +36,13 @@ public class GridPanel extends JPanel {
     this.model = model;
     this.setMaxRowsCols(model.getMaxRows(), model.getMaxColumns());
     this.selected = selected;
-    this.textField = null;
+    this.textField = new JTextField();
+    textField.setBackground(Color.ORANGE);
+    textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+    textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+    this.add(textField);
+    textField.setSize(CELL_WIDTH, CELL_HEIGHT);
+    textField.setLocation(45, 0);
     this.setLayout(null);
     this.featureListeners = new ArrayList<>();
   }
@@ -51,30 +57,28 @@ public class GridPanel extends JPanel {
 
     Graphics2D g2d = (Graphics2D)g;
 
+    if (selected != null) {
+      g2d.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
+      g2d.drawString(this.selected.toString() + ":", 20, 17);
+    }
     for (int i = 0; i <= maxCols; i++) {
       for (int j = 0; j <= maxRows; j++) {
         if (i == 0 && j == 0) {
-          drawCell(g2d, 15, 15, Color.LIGHT_GRAY, "");
+          drawCell(g2d, 15, 30, Color.LIGHT_GRAY, "");
         }
         else if (i == 0) {
-          drawCell(g2d, 15, 15 + j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
+          drawCell(g2d, 15, 30 + j * CELL_HEIGHT, Color.LIGHT_GRAY, Integer.toString(j));
         }
         else if (j == 0) {
-          drawCell(g2d,  15 + i * CELL_WIDTH, 15, Color.LIGHT_GRAY, Coord.colIndexToName(i));
+          drawCell(g2d,  15 + i * CELL_WIDTH, 30, Color.LIGHT_GRAY, Coord.colIndexToName(i));
         }
         else {
+          drawCell(g2d, 15 + i * CELL_WIDTH, 30 + j * CELL_HEIGHT,
+              Color.WHITE, model.getEval(i, j));
           if (selected != null && selected.col == i && selected.row == j) {
             final int col = i;
             final int row = j;
-            drawCell(
-                g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT, Color.ORANGE, "");
-            this.textField = new JTextField(model.getRaw(i, j));
-            textField.setBackground(Color.ORANGE);
-            textField.setFont(new Font("TimesRoman", Font.PLAIN, FONT_SIZE));
-            textField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-            this.add(textField);
-            textField.setSize(CELL_WIDTH, CELL_HEIGHT);
-            textField.setLocation(15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT);
+            textField.setText(model.getRaw(i, j));
             for (FeatureListener f : this.featureListeners) {
               textField.addKeyListener(new KeyListener() {
                 @Override
@@ -86,7 +90,7 @@ public class GridPanel extends JPanel {
                 public void keyPressed(KeyEvent e) {
                   switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER:
-                      f.onCellContentsUpdate(new Coord(col, row), GridPanel.this.getInputText());
+                      f.onCellContentsUpdate(new Coord(col, row), textField.getText());
                       selected = null; //Deselect the cell
                       break;
                     case KeyEvent.VK_ESCAPE:
@@ -102,27 +106,15 @@ public class GridPanel extends JPanel {
               });
             }
           }
-          else {
-            drawCell(g2d, 15 + i * CELL_WIDTH, 15 + j * CELL_HEIGHT,
-                Color.WHITE, model.getEval(i, j));
-          }
         }
       }
     }
   }
 
-  /**
-   * Returns the string from the text field.
-   */
-  private String getInputText() {
-    System.out.println(textField.getText());
-    return textField.getText();
-  }
-
   @Override
   public Dimension getPreferredSize() {
     return new Dimension(
-        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 30);
+        (maxCols + 1) * CELL_WIDTH + 30, (maxRows + 1) * CELL_HEIGHT + 45);
   }
 
   /**
@@ -179,7 +171,7 @@ public class GridPanel extends JPanel {
    */
   Coord pixelToCoord(Point p) {
     int col = (int)p.getX() / CELL_WIDTH;
-    int row = (int)p.getY() / CELL_HEIGHT;
+    int row = ((int)p.getY() - 15) / CELL_HEIGHT;
     return col < 1 || row < 1 ? null : new Coord(col, row);
   }
 
@@ -188,7 +180,6 @@ public class GridPanel extends JPanel {
    * @param coord  the coordinate of the cell to be selected
    */
   void setActiveCell(Coord coord) {
-    this.removeAll();
     this.selected = coord;
   }
 
