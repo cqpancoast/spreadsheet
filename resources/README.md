@@ -73,3 +73,7 @@ to add `FeatureListener`s to the both, though in `GridWorksheetView` and in `Tex
 those methods do nothing. In `EditableGridWorksheetView`, when a `FeatureListener` is added, the
 view "hooks up" the listener to a bunch of swing events that occur. In this way, we are able to
 completely divorce the controller from swing. Yippee!
+
+Additionally, the text field for the editing feature of the gui view was moved from the `GridPanel`
+class to the `EditableGridWorksheetView` because it was not a necessary feature to the
+`GridWorksheetView`, and it made for easier saving of the edits in `EditableGridWorksheetView`.
