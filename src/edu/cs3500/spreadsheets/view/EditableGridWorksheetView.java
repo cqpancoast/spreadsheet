@@ -277,6 +277,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
             case KeyEvent.VK_ENTER:
               f.onCellContentsUpdate(new Coord(selected.col, selected.row), textField.getText());
               f.onCellDeselection();
+              EditableGridWorksheetView.this.requestFocus();
               break;
             case KeyEvent.VK_ESCAPE:
               f.onCellDeselection();
