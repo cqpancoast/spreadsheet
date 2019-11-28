@@ -1,10 +1,8 @@
 package edu.cs3500.spreadsheets.provider.view;
 
 import java.io.IOException;
-
 import edu.cs3500.spreadsheets.model.Coord;
-
-import edu.cs3500.spreadsheets.model.ReadOnlyWorksheetModel;
+import edu.cs3500.spreadsheets.provider.model.ReadOnlyWorksheetModel;
 
 /**
  * Represents a text-based worksheet view.

@@ -1,6 +1,6 @@
 package edu.cs3500.spreadsheets.provider.view;
 
-import edu.cs3500.spreadsheets.model.ReadOnlyWorksheetModel;
+import edu.cs3500.spreadsheets.provider.model.ReadOnlyWorksheetModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.io.IOException;

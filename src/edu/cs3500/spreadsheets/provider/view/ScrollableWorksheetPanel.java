@@ -8,7 +8,7 @@ import java.awt.event.AdjustmentListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import edu.cs3500.spreadsheets.model.Coord;
-import edu.cs3500.spreadsheets.model.ReadOnlyWorksheetModel;
+import edu.cs3500.spreadsheets.provider.model.ReadOnlyWorksheetModel;
 
 /**
  * Represents a Worksheet panel that scrolls.
