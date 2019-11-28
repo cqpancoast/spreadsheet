@@ -148,6 +148,7 @@ public class EditableGridWorksheetView extends JFrame implements IWorksheetView 
     } else {
       selected = null;
       gridPanel.setActiveCell(null);
+      textLabel.setText("");
       textField.setText("");
     }
   }
