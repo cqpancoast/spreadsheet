@@ -6,6 +6,7 @@ import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
 import edu.cs3500.spreadsheets.model.SexpEvaluator;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
+//import edu.cs3500.spreadsheets.provider.view.EditableWorksheetView;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
 import edu.cs3500.spreadsheets.view.GridWorksheetView;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
@@ -35,7 +36,7 @@ public class BeyondGood {
 
     // Create the model from the file, if one is provided
     IWorksheetModel model = null;
-    if (args[0].equals("-gui")) {
+    if (args[0].equals("-gui") || args[0].equals("-edit") || args[0].equals("-provider")) {
       try {
         model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
             new StringReader(""));
@@ -84,6 +85,15 @@ public class BeyondGood {
         e.printStackTrace();
         System.out.println("Error in displaying editable grid, man.");
       }
+    } else if (args[2].equals("-provider") || args[0].equals("-provider")) {
+      try {
+        WorksheetController controller = new WorksheetController(model);
+        //controller.setView(new EditableWorksheetView(model)); //(model, controller) ???
+        controller.commence();
+      } catch (Exception e) {
+        e.printStackTrace();
+        System.out.println("Error in displaying provider's grid, man.");
+      }
     }
   }
 
@@ -95,22 +105,23 @@ public class BeyondGood {
    * - -gui
    * -in [some-filename] -edit
    * -edit
+   * -in [some-filename] -provider
+   * -provider
    * Does not check for validity of file name, but does check for validity of cell name.
    * @param args main args
    * @return whether args follow the correct format
    */
   private static boolean wellFormedCommand(String[] args) {
-    if (args[0].equals("-gui") || args[0].equals("-edit")) {
+    if (args[0].equals("-gui") || args[0].equals("-edit") || args[0].equals("-provider")) {
       return args.length == 1;
     } else if (args[0].equals("-in")) {
       if (args.length == 4) {
         if (args[2].equals("-eval")) {
           return Coord.validCellName(args[3]);
-        } else if (args[2].equals("-save")) {
-          return true;
-        }
+        } else
+          return args[2].equals("-save");
       } else if (args.length == 3) {
-        return args[2].equals("-gui") || args[2].equals("-edit");
+        return args[2].equals("-gui") || args[2].equals("-edit") || args[2].equals("-provider");
       }
     }
     return false;

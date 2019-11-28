@@ -37,7 +37,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    * @param s the raw contents of a cell
    * @return the evaluation of s
    */
-  public T evaluate(String s) {
+  T evaluate(String s) {
     if (isBlankCell(s)) {
       return this.blankCellEvaluant();
     }

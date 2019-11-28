@@ -21,7 +21,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * Constructs a {@link SExpEvaluatorFormulaWorksheet}.
    * @param model the model that this evaluates {@link Sexp}s from.
    */
-  public SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
+  SExpEvaluatorFormulaWorksheet(FormulaWorksheetModel model) {
     if (model == null) {
       throw new IllegalArgumentException("Evaluator constructor received null model.");
     }
@@ -144,7 +144,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * @param colRef a reference to one or more columns.
    * @return the corresponding block reference
    */
-  protected String colRefToBlockRef(String colRef) {
+  String colRefToBlockRef(String colRef) {
     String[] splitString = colRef.split(":");
     if (splitString.length != 2) {
       throw new IllegalStateException("Invalid column reference string");

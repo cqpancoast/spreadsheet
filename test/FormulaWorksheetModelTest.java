@@ -374,9 +374,15 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(SUM D3:E3)");
     setModel("C3", "=(SUM E3:E4)");
     setModel("C4", "=(SUM D3:E4)");
+    setModel("C5", "=(SUM D:D)");
+    setModel("C6", "=(SUM E:E)");
+    setModel("C7", "=(SUM D:E)");
     assertEquals("5.0", getEvalModel("C2"));
     assertEquals("6.5", getEvalModel("C3"));
     assertEquals("10.5", getEvalModel("C4"));
+    assertEquals("4.0", getEvalModel("C5"));
+    assertEquals("13.5", getEvalModel("C6"));
+    assertEquals("17.5", getEvalModel("C7"));
   }
 
   @Test
@@ -437,9 +443,15 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(PRODUCT D3:E3)");
     setModel("C3", "=(PRODUCT E3:E4)");
     setModel("C4", "=(PRODUCT D3:E4)");
+    setModel("C5", "=(PRODUCT D:D)");
+    setModel("C6", "=(PRODUCT E:E)");
+    setModel("C7", "=(PRODUCT D:E)");
     assertEquals("6.0", getEvalModel("C2"));
     assertEquals("9.0", getEvalModel("C3"));
     assertEquals("27.0", getEvalModel("C4"));
+    assertEquals("0.0", getEvalModel("C5"));
+    assertEquals("63.0", getEvalModel("C6"));
+    assertEquals("0.0", getEvalModel("C7"));
   }
 
   @Test
@@ -539,10 +551,14 @@ public class FormulaWorksheetModelTest {
     setModel("C2", "=(ENUM D3:D7)");
     setModel("C3", "=(ENUM D3:D4 E6:E7)");
     setModel("C4", "=(ENUM D5:E7)");
-    assertEquals("3.0 1.0 true \"bees\" \"true\"", getEvalModel("C2"));
-    assertEquals("3.0 1.0  \"friend\" \"7.0\"" , getEvalModel("C3"));
-    assertEquals("true false \"bees\" \"friend\" \"true\" \"7.0\"",
-        getEvalModel("C4"));
+    setModel("C5", "=(ENUM D:D)");
+    setModel("C6", "=(ENUM E:E)");
+    setModel("C7", "=(ENUM D:E)");
+    assertEquals(
+        "0.0 3.0 1.0 true \"bees\" \"true\" \"\"hey\"\"", getEvalModel("C5"));
+    assertEquals("2.0 4.5 false \"friend\" \"7.0\" \"\"" , getEvalModel("C6"));
+    assertEquals("0.0 3.0 1.0 true \"bees\" \"true\" \"\"hey\"\" "
+            + "2.0 4.5 false \"friend\" \"7.0\" \"\"", getEvalModel("C7"));
   }
 
   @Test
