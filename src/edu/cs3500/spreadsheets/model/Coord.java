@@ -85,6 +85,16 @@ public class Coord {
     return s.matches("[A-Z]+[0-9]+");
   }
 
+  /**
+   * Returns whether the symbol s is a valid column name by asserting the invariant that "1" is
+   * always a valid row number.
+   * @param s string representation of a symbol
+   * @return whether s is a valid column name
+   */
+  public static boolean validColumnName(String s) {
+    return validCellName(s + "1");
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

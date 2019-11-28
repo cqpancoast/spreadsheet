@@ -73,6 +73,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   public String visitSymbol(String s) {
     if (isBlockReference(s)) {
       return this.visitBlockReference(s);
+    } else if (isColumnReference(s)) {
+      return this.visitColumnReference(s);
     } else if (isReference(s)) {
       return this.visitReference(s);
     } else {
@@ -92,6 +94,15 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    */
   protected String visitBlockReference(String blockRef) {
     return errorInvalidBlockCellRef;
+  }
+
+  /**
+   * Evaluates colRef according to the rules of {@link FormulaWorksheetModel}.
+   * @param colRef a string representation of a {@link SSymbol} column reference
+   * @return the evaluation of colRef
+   */
+  protected String visitColumnReference(String colRef) {
+    return errorInvalidColumnCellRef;
   }
 
   /**
@@ -128,12 +139,17 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
   }
 
   /**
-   * Returns new instance of this class with the same model field. The purpose of this is to ensure
-   * that
-   * @return new instance of this
+   * Given a column reference, converts it to a block reference depending on the maximum row of
+   * entered data in the model.
+   * @param colRef a reference to one or more columns.
+   * @return the corresponding block reference
    */
-  protected SExpEvaluatorFormulaWorksheet newInstanceOfThis() {
-    return new SExpEvaluatorFormulaWorksheet(this.model);
+  protected String colRefToBlockRef(String colRef) {
+    String[] splitString = colRef.split(":");
+    if (splitString.length != 2) {
+      throw new IllegalStateException("Invalid column reference string");
+    }
+    return splitString[0] + "1:" + splitString[1] + model.getMaxRows();
   }
 
 
@@ -209,7 +225,13 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       }
       return blockAccumulator.toString();
     }
+
+    @Override
+    protected String visitColumnReference(String colRef) {
+      return this.visitBlockReference(this.colRefToBlockRef(colRef));
+    }
   }
+
 
   /**
    * Sums all sexp arguments in the input list that can be interpreted as doubles. Blanks are
@@ -454,4 +476,5 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       return nextReference;
     }
   }
+
 }

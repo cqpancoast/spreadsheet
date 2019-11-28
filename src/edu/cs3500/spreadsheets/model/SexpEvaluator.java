@@ -13,6 +13,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
 
   static final String errorInvalidBlankCellRef = "!#ERROR_INVALIDBLANKCELLREF";
   static final String errorInvalidBlockCellRef = "!#ERROR_INVALIDBLOCKCELLREF";
+  static final String errorInvalidColumnCellRef = "!#ERROR_INVALIDCOLUMNCELLREF";
   static final String errorInvalidSymbol = "!#ERROR_INVALIDSYMBOL";
   static final String errorInvalidCommand = "!#ERROR_INVALIDCOMMAND";
   static final String errorCyclicRef = "!#ERROR_CYCLICREF";
@@ -101,12 +102,20 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     if (refs.length != 2) {
       return false;
     }
-    for (String ref : refs) {
-      if (!isReference(ref)) {
-        return false;
-      }
+    return isReference(refs[0]) && isReference(refs[1]);
+  }
+
+  /**
+   * Determines whether s is a column reference.
+   * @param s the given string representation of an {@link SSymbol}
+   * @return whether s is a column reference
+   */
+  static boolean isColumnReference(String s) {
+    String[] refs = s.split(":");
+    if (refs.length != 2) {
+      return false;
     }
-    return true;
+    return Coord.validColumnName(refs[0]) && Coord.validColumnName(refs[0]);
   }
 
   /**
@@ -127,4 +136,5 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     String[] splitMaybeError = evalArg.split("_");
     return splitMaybeError[0].equals("!#ERROR");
   }
+
 }
