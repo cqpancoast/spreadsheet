@@ -381,8 +381,8 @@ public class FormulaWorksheetModelTest {
     assertEquals("6.5", getEvalModel("C3"));
     assertEquals("10.5", getEvalModel("C4"));
     assertEquals("4.0", getEvalModel("C5"));
-    assertEquals("13.5", getEvalModel("C6"));
-    assertEquals("17.5", getEvalModel("C7"));
+    assertEquals("6.5", getEvalModel("C6"));
+    assertEquals("10.5", getEvalModel("C7"));
   }
 
   @Test
@@ -450,7 +450,7 @@ public class FormulaWorksheetModelTest {
     assertEquals("9.0", getEvalModel("C3"));
     assertEquals("27.0", getEvalModel("C4"));
     assertEquals("0.0", getEvalModel("C5"));
-    assertEquals("63.0", getEvalModel("C6"));
+    assertEquals("9.0", getEvalModel("C6"));
     assertEquals("0.0", getEvalModel("C7"));
   }
 
