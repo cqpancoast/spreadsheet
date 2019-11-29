@@ -38,7 +38,11 @@ public class WorksheetControllerAdapter implements WorksheetController {
 
   @Override
   public void updateCellAt(Coord c, String content) {
-    ourController.onCellContentsUpdate(c, content);
+    if (content.equals("")) {
+      ourController.onCellContentsUpdate(c, null);
+    } else {
+      ourController.onCellContentsUpdate(c, content);
+    }
   }
 
   @Override

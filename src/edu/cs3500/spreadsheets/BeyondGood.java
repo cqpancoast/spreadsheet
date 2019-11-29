@@ -47,6 +47,7 @@ public class BeyondGood {
         model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
             new StringReader(""));
       } catch (Exception e) {
+        e.printStackTrace();
         System.out.println("Error creating worksheet model:\n" + e.getMessage());
       }
     } else if (args[0].equals("-in")) {
@@ -55,6 +56,7 @@ public class BeyondGood {
         model = WorksheetReader.read(new FormulaWorksheetModel.FormulaWorksheetBuilder(),
             new BufferedReader(new FileReader(new File(fileName))));
       } catch (Exception e) {
+        e.printStackTrace();
         System.out.println("Error creating worksheet model:\n" + e.getMessage());
         return;
       }
@@ -66,6 +68,7 @@ public class BeyondGood {
         assert model != null;
         evaluateCellInWorksheet(model, args[3]);
       } catch (Exception e) {
+        e.printStackTrace();
         System.out.println("Error in cell evaluation, man.");
       }
     } else if (args[2].equals("-save")) {
@@ -74,6 +77,7 @@ public class BeyondGood {
         new TextualWorksheetView(model, fileWriter).render();
         fileWriter.close();
       } catch (Exception e) {
+        e.printStackTrace();
         System.out.println("Error in saving file, man.");
       }
     } else if (args[2].equals("-gui") || args[0].equals("-gui")) {
