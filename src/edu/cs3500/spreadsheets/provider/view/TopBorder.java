@@ -1,15 +1,10 @@
 package edu.cs3500.spreadsheets.provider.view;
 
 import java.awt.Dimension;
-
 import java.awt.Color;
-
 import java.awt.Graphics;
-
 import java.awt.Graphics2D;
-
 import javax.swing.JPanel;
-
 import edu.cs3500.spreadsheets.model.Coord;
 
 /**

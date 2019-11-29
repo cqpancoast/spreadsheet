@@ -49,7 +49,7 @@ public interface IWorksheetModel {
 
   /**
    * Returns a list of {@link Coord}s for positions of active cells.
-   * @return a list of coordinates of active cells in this worksheet.
+   * @return a list of coordinates of active cells in this worksheet
    */
   Set<Coord> getActiveCells();
 

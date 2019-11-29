@@ -3,12 +3,18 @@ package edu.cs3500.spreadsheets;
 import edu.cs3500.spreadsheets.controller.WorksheetController;
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.FormulaWorksheetModel;
-import edu.cs3500.spreadsheets.model.SexpEvaluator;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
+import edu.cs3500.spreadsheets.model.SexpEvaluator;
 import edu.cs3500.spreadsheets.model.WorksheetReader;
-//import edu.cs3500.spreadsheets.provider.view.EditableWorksheetView;
+import edu.cs3500.spreadsheets.provider.conversion.WorksheetControllerAdapter;
+import edu.cs3500.spreadsheets.provider.conversion.WorksheetModelAdapter;
+import edu.cs3500.spreadsheets.provider.conversion.WorksheetViewAdapter;
+import edu.cs3500.spreadsheets.provider.model.ReadOnlyWorksheetModel;
+import edu.cs3500.spreadsheets.provider.view.EditableWorksheetView;
+import edu.cs3500.spreadsheets.provider.view.WorksheetView;
 import edu.cs3500.spreadsheets.view.EditableGridWorksheetView;
 import edu.cs3500.spreadsheets.view.GridWorksheetView;
+import edu.cs3500.spreadsheets.view.IWorksheetView;
 import edu.cs3500.spreadsheets.view.TextualWorksheetView;
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,9 +93,14 @@ public class BeyondGood {
       }
     } else if (args[2].equals("-provider") || args[0].equals("-provider")) {
       try {
-        WorksheetController controller = new WorksheetController(model);
-        //controller.setView(new EditableWorksheetView(model)); //(model, controller) ???
-        controller.commence();
+        WorksheetController ourController = new WorksheetController(model);
+        WorksheetControllerAdapter theirController = new WorksheetControllerAdapter(ourController);
+        ReadOnlyWorksheetModel theirModel = new WorksheetModelAdapter(model);
+        WorksheetView theirView = new EditableWorksheetView(theirModel, theirController);
+        IWorksheetView ourView = new WorksheetViewAdapter(theirView);
+        ourController.setView(ourView);
+        theirController.setView(ourView);
+        theirController.commence();
       } catch (Exception e) {
         e.printStackTrace();
         System.out.println("Error in displaying provider's grid, man.");
