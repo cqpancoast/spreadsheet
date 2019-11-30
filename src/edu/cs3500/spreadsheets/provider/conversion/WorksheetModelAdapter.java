@@ -29,7 +29,12 @@ public class WorksheetModelAdapter implements ReadOnlyWorksheetModel {
 
   @Override
   public String getBasicContentAt(Coord c) {
-    return this.ourModel.getRaw(c.col, c.row);
+    String basicContent = this.ourModel.getRaw(c.col, c.row);
+    if (basicContent == null) {
+      return "";
+    } else {
+      return basicContent;
+    }
   }
 
   @Override
