@@ -2,7 +2,7 @@ package edu.cs3500.spreadsheets.provider.conversion;
 
 import edu.cs3500.spreadsheets.model.Coord;
 import edu.cs3500.spreadsheets.model.IWorksheetModel;
-import edu.cs3500.spreadsheets.provider.model.Function; //NOTE
+import edu.cs3500.spreadsheets.provider.model.Function;
 import edu.cs3500.spreadsheets.provider.model.ReadOnlyWorksheetModel;
 import edu.cs3500.spreadsheets.provider.model.Value;
 import edu.cs3500.spreadsheets.provider.model.WorksheetModel;
@@ -48,7 +48,7 @@ public class WorksheetModelAdapter implements ReadOnlyWorksheetModel {
   }
 
   @Override
-  public Function<List<Value>, Value> getSupportedFunctions(String s) { //TODO: consider
+  public Function<List<Value>, Value> getSupportedFunctions(String s) { //NOTE
     return null;
   }
 
