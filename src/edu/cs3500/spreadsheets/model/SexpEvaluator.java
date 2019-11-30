@@ -4,6 +4,11 @@ import edu.cs3500.spreadsheets.sexp.Parser;
 import edu.cs3500.spreadsheets.sexp.SSymbol;
 import edu.cs3500.spreadsheets.sexp.Sexp;
 import edu.cs3500.spreadsheets.sexp.SexpVisitor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A visitor to evaluate string-represented {@link Sexp} values in a {@link FormulaWorksheetModel}.
@@ -75,6 +80,41 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
    */
   protected abstract T errorEvaluant();
 
+  @Override
+  public T visitSymbol(String s) {
+    if (isReference(s)) {
+      return this.visitReference(s);
+    } else if (isBlockReference(s)) {
+      return this.visitBlockReference(s);
+    } else if (isColumnReference(s)) {
+      return this.visitColumnReference(s);
+    } else {
+      return this.errorEvaluant();
+    }
+  }
+
+  /**
+   * Evaluates ref according to the rules of {@link FormulaWorksheetModel}. Returns an error symbol
+   * if the reference structure has any cycles.
+   * @param ref a string representation of a {@link SSymbol} reference
+   * @return the evaluation of ref
+   */
+  protected abstract T visitReference(String ref);
+
+  /**
+   * Evaluates blockRef according to the rules of {@link FormulaWorksheetModel}.
+   * @param blockRef a string representation of a {@link SSymbol} block reference
+   * @return the evaluation of blockRef
+   */
+  protected abstract T visitBlockReference(String blockRef);
+
+  /**
+   * Evaluates colRef according to the rules of {@link FormulaWorksheetModel}.
+   * @param colRef a string representation of a {@link SSymbol} column reference
+   * @return the evaluation of colRef
+   */
+  protected abstract T visitColumnReference(String colRef);
+
   /**
    * Ensures that the raw value has the correct syntax with respect to equals signs and formulae.
    * Returns syntax error symbol if raw begins with an open paren, removes equals sign if raw begins
@@ -102,7 +142,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     if (refs.length != 2) {
       return false;
     }
-    return isReference(refs[0]) && isReference(refs[1]);
+    return Coord.validCellName(refs[0]) && Coord.validCellName(refs[1]);
   }
 
   /**
@@ -115,7 +155,7 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     if (refs.length != 2) {
       return false;
     }
-    return Coord.validColumnName(refs[0]) && Coord.validColumnName(refs[0]);
+    return Coord.validColumnName(refs[0]) && Coord.validColumnName(refs[1]);
   }
 
   /**
@@ -137,4 +177,60 @@ public abstract class SexpEvaluator<T> implements SexpVisitor<T> {
     return splitMaybeError[0].equals("!#ERROR");
   }
 
+  /**
+   * Given a string specifying worksheet cells that are at the corners of some region, iterates over
+   * the cells in that region.
+   */
+  protected static final class BlockReferenceIterator implements Iterator<String> {
+
+    private final int startCol;
+    private final int startRow;
+    private final int endCol;
+    private final int endRow;
+    private int col;
+    private int row;
+
+    /**
+     * Creates a new {@link BlockReferenceIterator}.
+     * @param blockRef a string representing a reference to a block of cells
+     */
+    BlockReferenceIterator(String blockRef) {
+      if (!isBlockReference(blockRef)) {
+        throw new IllegalArgumentException("Received invalid block reference string.");
+      }
+
+      String[] refs = blockRef.split(":");
+      List<Integer> firstRefCoord = Coord.fromString(refs[0]);
+      List<Integer> secondRefCoord = Coord.fromString(refs[1]);
+      List<Integer> cols
+          = new ArrayList<>(Arrays.asList(firstRefCoord.get(0), secondRefCoord.get(0)));
+      List<Integer> rows
+          = new ArrayList<>(Arrays.asList(firstRefCoord.get(1), secondRefCoord.get(1)));
+      Collections.sort(cols);
+      Collections.sort(rows);
+
+      this.startCol = cols.get(0);
+      this.startRow = rows.get(0);
+      this.endCol = cols.get(1);
+      this.endRow = rows.get(1);
+      this.col = this.startCol;
+      this.row = this.startRow;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return this.row <= endRow;
+    }
+
+    @Override
+    public String next() {
+      String nextReference = Coord.colIndexToName(this.col) + this.row;
+      this.col += 1;
+      if (this.col > this.endCol) {
+        this.col = this.startCol;
+        this.row += 1;
+      }
+      return nextReference;
+    }
+  }
 }

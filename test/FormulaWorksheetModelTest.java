@@ -41,7 +41,7 @@ public class FormulaWorksheetModelTest {
         .createCell(4, 5, "true").createCell(5, 5, "false")
         .createCell(4, 6, "\"bees\"").createCell(5, 6, "\"friend\"")
         .createCell(4, 7, "\"true\"").createCell(5, 7, "\"7.0\"")
-        .createCell(4, 8, "\"\"hey\"\"").createCell(5, 8, "\"\"")
+        .createCell(4, 8, "\"\\\"hey\\\"\"").createCell(5, 8, "\"\"")
         .createWorksheet();
   }
 
@@ -555,10 +555,12 @@ public class FormulaWorksheetModelTest {
     setModel("C6", "=(ENUM E:E)");
     setModel("C7", "=(ENUM D:E)");
     assertEquals(
-        "0.0 3.0 1.0 true \"bees\" \"true\" \"\"hey\"\"", getEvalModel("C5"));
-    assertEquals("2.0 4.5 false \"friend\" \"7.0\" \"\"" , getEvalModel("C6"));
-    assertEquals("0.0 3.0 1.0 true \"bees\" \"true\" \"\"hey\"\" "
-            + "2.0 4.5 false \"friend\" \"7.0\" \"\"", getEvalModel("C7"));
+        "<blank> 0.0 3.0 1.0 true \"bees\" \"true\" \"\"hey\"\"",
+        getEvalModel("C5"));
+    assertEquals("<blank> <blank> 2.0 4.5 false \"friend\" \"7.0\" \"\"",
+        getEvalModel("C6"));
+    assertEquals("<blank> <blank> 0.0 <blank> 3.0 2.0 1.0 4.5 true false \"bees\""
+        + " \"friend\" \"true\" \"7.0\" \"\"hey\"\" \"\"", getEvalModel("C7"));
   }
 
   @Test
@@ -611,12 +613,34 @@ public class FormulaWorksheetModelTest {
   }
 
   @Test
+  public void getEval_formulae_SUM_cyclic() {
+    initWorksheetData();
+    setModel("D1", "=(SUM D1 4)");
+    setModel("D2", "=(SUM D3:E7)");
+    setModel("D3", "=(SUM D:E)");
+    assertEquals(errorArgIsError, getEvalModel("D1"));
+    assertEquals(errorArgIsError, getEvalModel("D2"));
+    assertEquals(errorArgIsError, getEvalModel("D3"));
+  }
+
+  @Test
   public void getEval_formulae_PRODUCT_errorProp() {
     initWorksheetData();
     setModel("C2", "=(< 4)");
     setModel("C3", "=(PRODUCT C2 3 6)");
     assertEquals(errorInvalidArity, getEvalModel("C2"));
     assertEquals(errorArgIsError, getEvalModel("C3"));
+  }
+
+  @Test
+  public void getEval_formulae_PRODUCT_cyclic() {
+    initWorksheetData();
+    setModel("D1", "=(PRODUCT D1 4)");
+    setModel("D2", "=(PRODUCT D3:E7)");
+    setModel("D3", "=(PRODUCT D:E)");
+    assertEquals(errorArgIsError, getEvalModel("D1"));
+    assertEquals(errorArgIsError, getEvalModel("D2"));
+    assertEquals(errorArgIsError, getEvalModel("D3"));
   }
 
   @Test
@@ -670,6 +694,17 @@ public class FormulaWorksheetModelTest {
     setModel("C3", "=(ENUM C2");
     assertEquals(errorInvalidArity, getEvalModel("C2"));
     assertEquals(errorSyntax, getEvalModel("C3"));
+  }
+
+  @Test
+  public void getEval_formulae_ENUM_cyclic() {
+    initWorksheetData();
+    setModel("D1", "=(ENUM D1 4)");
+    setModel("D2", "=(ENUM D3:E7)");
+    setModel("D3", "=(ENUM D:E)");
+    assertEquals(errorArgIsError, getEvalModel("D1"));
+    assertEquals(errorArgIsError, getEvalModel("D2"));
+    assertEquals(errorArgIsError, getEvalModel("D3"));
   }
 
   /** Tests for {@link FormulaWorksheetModel#getRaw(int, int)}. */

@@ -30,7 +30,7 @@ public class Coord {
    * @param name the column name
    * @return the corresponding column index
    */
-  public static int colNameToIndex(String name) {
+  static int colNameToIndex(String name) {
     name = name.toUpperCase();
     int ans = 0;
     for (int i = 0; i < name.length(); i++) {
@@ -67,8 +67,8 @@ public class Coord {
     }
     String rowString = refString.replaceAll("[^0-9]", "");
     String colString = refString.replaceAll("[^A-Z]", "");
-    return new ArrayList<Integer>(
-          Arrays.asList(Coord.colNameToIndex(colString), Integer.parseInt(rowString)));
+    return new ArrayList<>(
+        Arrays.asList(Coord.colNameToIndex(colString), Integer.parseInt(rowString)));
   }
 
   @Override
@@ -86,13 +86,12 @@ public class Coord {
   }
 
   /**
-   * Returns whether the symbol s is a valid column name by asserting the invariant that "1" is
-   * always a valid row number.
+   * Returns whether the symbol s is a valid column name in a worksheet.
    * @param s string representation of a symbol
    * @return whether s is a valid column name
    */
-  public static boolean validColumnName(String s) {
-    return validCellName(s + "1");
+  static boolean validColumnName(String s) {
+    return s.matches("[A-Z]+");
   }
 
   @Override

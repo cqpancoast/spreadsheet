@@ -3,10 +3,6 @@ package edu.cs3500.spreadsheets.model;
 import edu.cs3500.spreadsheets.sexp.SList;
 import edu.cs3500.spreadsheets.sexp.SSymbol;
 import edu.cs3500.spreadsheets.sexp.Sexp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -87,31 +83,8 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     return "\"" + s + "\"";
   }
 
-  /**
-   * Evaluates blockRef according to the rules of {@link FormulaWorksheetModel}.
-   * @param blockRef a string representation of a {@link SSymbol} block reference
-   * @return the evaluation of blockRef
-   */
-  protected String visitBlockReference(String blockRef) {
-    return errorInvalidBlockCellRef;
-  }
-
-  /**
-   * Evaluates colRef according to the rules of {@link FormulaWorksheetModel}.
-   * @param colRef a string representation of a {@link SSymbol} column reference
-   * @return the evaluation of colRef
-   */
-  protected String visitColumnReference(String colRef) {
-    return errorInvalidColumnCellRef;
-  }
-
-  /**
-   * Evaluates ref according to the rules of {@link FormulaWorksheetModel}. Returns an error symbol
-   * if the reference structure has any cycles.
-   * @param ref a string representation of a {@link SSymbol} reference
-   * @return the evaluation of ref
-   */
-  private String visitReference(String ref) {
+  @Override
+  protected String visitReference(String ref) {
     if (this.hasCycles(ref)) {
       return errorCyclicRef;
     }
@@ -128,14 +101,14 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
   }
 
-  /**
-   * Determines whether the reference represented by refString refers to itself recursively in the
-   * worksheet in which the cell is instantiated.
-   * @param refString a string representation of a cell reference
-   * @return whether the cell refers to itself recursively
-   */
-  private boolean hasCycles(String refString) {
-    return new SexpCheckCycles(this.model).visitSymbol(refString);
+  @Override
+  protected String visitBlockReference(String blockRef) {
+    return errorInvalidBlockCellRef;
+  }
+
+  @Override
+  protected String visitColumnReference(String colRef) {
+    return errorInvalidColumnCellRef;
   }
 
   /**
@@ -144,12 +117,22 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * @param colRef a reference to one or more columns.
    * @return the corresponding block reference
    */
-  String colRefToBlockRef(String colRef) {
+  String colRefToBlockRef(String colRef) { //HELP BLERNER
     String[] splitString = colRef.split(":");
     if (splitString.length != 2) {
       throw new IllegalStateException("Invalid column reference string");
     }
     return splitString[0] + "1:" + splitString[1] + model.getMaxRows();
+  }
+
+  /**
+   * Determines whether the reference represented by refString refers to itself recursively in the
+   * worksheet in which the cell is instantiated.
+   * @param refString a string representation of a cell reference
+   * @return whether the cell refers to itself recursively
+   */
+  private boolean hasCycles(String refString) {
+    return new SexpCheckCycles(this.model).visitSymbol(refString);
   }
 
 
@@ -171,9 +154,10 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
     /**
      * Provides an initial value for the accumulator.
+     * @param sizeOfAcc the number of values to be accumulated
      * @return the initialized value of the accumulative variable
      */
-    protected abstract T initializeValue();
+    protected abstract T initializeValue(int sizeOfAcc);
 
     /**
      * Increments this accumulator's accumulative value by some function of evalArg.
@@ -184,7 +168,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
     @Override
     public String visitSList(List<Sexp> args) {
-      T accumulator = this.initializeValue();
+      T accumulator = this.initializeValue(args.size());
       for (Sexp arg : args) {
         //If the sexp is a list, then it is a command and should be evaluated by a new evaluator
         String evalArg;
@@ -210,7 +194,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
 
     @Override
     protected String visitBlockReference(String blockRef) {
-      T blockAccumulator = this.initializeValue();
+      T blockAccumulator = this.initializeValue(0);
       BlockReferenceIterator blockRefs = new BlockReferenceIterator(blockRef);
       while (blockRefs.hasNext()) {
         String refEval = this.evaluate(blockRefs.next());
@@ -248,15 +232,15 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected StringBuilder initializeValue() {
+    protected StringBuilder initializeValue(int size) {
       return new StringBuilder("0.0");
     }
 
     @Override
     protected void accumulate(StringBuilder accumulator, String evalArg) {
-      Double var = (Double.parseDouble(accumulator.toString()) + Double.parseDouble(evalArg));
+      Double newAcc = (Double.parseDouble(accumulator.toString()) + Double.parseDouble(evalArg));
       accumulator.delete(0, accumulator.length());
-      accumulator.append(var);
+      accumulator.append(newAcc);
     }
 
     @Override
@@ -273,7 +257,6 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     protected final String blankCellEvaluant() {
       return "0";
     }
-
   }
 
   /**
@@ -281,6 +264,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
    * interpreted as zero. Returns error symbol if any of the args are errors.
    */
   private static final class SexpEvaluatorProduct extends SexpEvaluatorAccumulator<StringBuilder> {
+    boolean seenNum;
 
     /**
      * Constructs a {@link SexpEvaluatorProduct}.
@@ -288,27 +272,28 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
      */
     SexpEvaluatorProduct(FormulaWorksheetModel model) {
       super(model);
+      seenNum = false;
     }
 
     @Override
-    protected StringBuilder initializeValue() {
-      return new StringBuilder("0.0");
+    protected StringBuilder initializeValue(int size) {
+      return size == 0 ? new StringBuilder("0.0") : new StringBuilder("1.0");
     }
 
     @Override
     protected void accumulate(StringBuilder accumulator, String evalArg) {
-      double var;
-      if (Double.parseDouble(accumulator.toString()) == 0.0 && evalArg.equals("nonNumeric")) {
-        var = 0.0;
-      }
-      else if (Double.parseDouble(accumulator.toString()) == 0.0) {
-        var = (1.0 * Double.parseDouble(evalArg));
-      }
-      else {
-        var = (Double.parseDouble(accumulator.toString()) * Double.parseDouble(evalArg));
+      double currAcc = seenNum ? Double.parseDouble(accumulator.toString()) : 0.0;
+      double newAcc;
+      if (evalArg.equals("nonNumeric")) {
+        newAcc = currAcc;
+      } else if (currAcc == 0.0 && !seenNum) {
+        seenNum = true;
+        newAcc = (1.0 * Double.parseDouble(evalArg));
+      } else {
+        newAcc = (currAcc * Double.parseDouble(evalArg));
       }
       accumulator.delete(0, accumulator.length());
-      accumulator.append(var);
+      accumulator.append(newAcc);
     }
 
     @Override
@@ -405,7 +390,7 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
     }
 
     @Override
-    protected StringBuilder initializeValue() {
+    protected StringBuilder initializeValue(int size) {
       return new StringBuilder();
     }
 
@@ -419,62 +404,4 @@ public class SExpEvaluatorFormulaWorksheet extends SexpEvaluator<String> {
       return "<blank>";
     }
   }
-
-  /**
-   * Given a string specifying worksheet cells that are at the corners of some region, iterates over
-   * the cells in that region.
-   */
-  private static final class BlockReferenceIterator implements Iterator<String> {
-
-    private final int startCol;
-    private final int startRow;
-    private final int endCol;
-    private final int endRow;
-    private int col;
-    private int row;
-
-    /**
-     * Creates a new {@link BlockReferenceIterator}.
-     * @param blockRef a string representing a reference to a block of cells
-     */
-    private BlockReferenceIterator(String blockRef) {
-      if (!isBlockReference(blockRef)) {
-        throw new IllegalArgumentException("Received invalid block reference string.");
-      }
-
-      String[] refs = blockRef.split(":");
-      List<Integer> firstRefCoord = Coord.fromString(refs[0]);
-      List<Integer> secondRefCoord = Coord.fromString(refs[1]);
-      List<Integer> cols
-          = new ArrayList<>(Arrays.asList(firstRefCoord.get(0), secondRefCoord.get(0)));
-      List<Integer> rows
-          = new ArrayList<>(Arrays.asList(firstRefCoord.get(1), secondRefCoord.get(1)));
-      Collections.sort(cols);
-      Collections.sort(rows);
-
-      this.startCol = cols.get(0);
-      this.startRow = rows.get(0);
-      this.endCol = cols.get(1);
-      this.endRow = rows.get(1);
-      this.col = this.startCol;
-      this.row = this.startRow;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return this.row <= endRow;
-    }
-
-    @Override
-    public String next() {
-      String nextReference = Coord.colIndexToName(this.col) + this.row;
-      this.col += 1;
-      if (this.col > this.endCol) {
-        this.col = this.startCol;
-        this.row += 1;
-      }
-      return nextReference;
-    }
-  }
-
 }

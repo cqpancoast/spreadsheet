@@ -62,14 +62,57 @@ public class SexpCheckCycles extends SexpEvaluator<Boolean> {
   }
 
   @Override
-  public Boolean visitSymbol(String s) {
-    if (cellsSoFar.contains(s)) {
+  protected Boolean visitReference(String ref) {
+    if (cellsSoFar.contains(ref)) {
       return true;
     }
-    cellsSoFar.add(s);
-    List<Integer> cellCoord = Coord.fromString(s);
+    cellsSoFar.add(ref);
+    List<Integer> cellCoord = Coord.fromString(ref);
     String refRawString = this.model.getRaw(cellCoord.get(0), cellCoord.get(1));
     return this.evaluate(refRawString);
   }
 
+  @Override
+  protected Boolean visitBlockReference(String blockRef) {
+    BlockReferenceIterator blockIter;
+    blockIter = new BlockReferenceIterator(blockRef);
+    while (blockIter.hasNext()) {
+      if (this.visitReference(blockIter.next())) {
+        return true;
+      } else {
+        this.removeAllCellsAfter(blockRef);
+      }
+    }
+    return false;
+  }
+
+  @Override
+  protected Boolean visitColumnReference(String colRef) {
+    return this.visitBlockReference(this.colRefToBlockRef(colRef));
+  }
+
+  /**
+   * Removes all cells in cellsSoFar after the last instance of the given reference if there is one.
+   * @param ref  a cell reference
+   */
+  private void removeAllCellsAfter(String ref) {
+    int lastIndexOfRef = this.cellsSoFar.lastIndexOf(ref);
+    if (lastIndexOfRef != -1) {
+      this.cellsSoFar.subList(0, lastIndexOfRef);
+    }
+  }
+
+  /**
+   * Given a column reference, converts it to a block reference depending on the maximum row of
+   * entered data in the model.
+   * @param colRef a reference to one or more columns.
+   * @return the corresponding block reference
+   */
+  private String colRefToBlockRef(String colRef) {
+    String[] splitString = colRef.split(":");
+    if (splitString.length != 2) {
+      throw new IllegalStateException("Invalid column reference string");
+    }
+    return splitString[0] + "1:" + splitString[1] + model.getMaxRows();
+  }
 }
