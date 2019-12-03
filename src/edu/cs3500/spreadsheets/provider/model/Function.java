@@ -1,7 +1,7 @@
 package edu.cs3500.spreadsheets.provider.model;
 
 /**
- * Temp class created to make up for not receiving model class from providers
+ * Temp class created to make up for not receiving model class from providers.
  * @param <U>  in
  * @param <V>  out
  */

@@ -133,8 +133,9 @@ public class BeyondGood {
       if (args.length == 4) {
         if (args[2].equals("-eval")) {
           return Coord.validCellName(args[3]);
-        } else
+        } else {
           return args[2].equals("-save");
+        }
       } else if (args.length == 3) {
         return args[2].equals("-gui") || args[2].equals("-edit") || args[2].equals("-provider");
       }
